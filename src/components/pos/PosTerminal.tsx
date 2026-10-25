@@ -76,7 +76,7 @@ export const PosTerminal: React.FC<Props> = ({ settings, activeShift, onOpenShif
     const secRate = settings?.secondary_currency_rate || 0.92;
 
     HardwareService.broadcastToCustomerDisplay({
-      companyName: settings?.company_name || 'OmniPOS SuperStore',
+      companyName: settings?.company_name || 'Vendra SuperStore',
       primaryCurrencySymbol: settings?.primary_currency_symbol || '$',
       secondaryCurrencySymbol: settings?.secondary_currency_symbol || '€',
       secondaryRate: secRate,

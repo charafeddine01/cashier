@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.omnipos.pro',
-  appName: 'OmniPOS Pro',
+  appId: 'xyz.charafeddine.vendra',
+  appName: 'Vendra',
   webDir: 'dist',
   bundledWebRuntime: false,
   server: {

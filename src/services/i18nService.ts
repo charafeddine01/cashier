@@ -11,7 +11,7 @@ export interface Translations {
 
 const enTranslations: Translations = {
   // Navigation & General
-  'app.title': 'OmniPOS Pro',
+  'app.title': 'Vendra POS',
   'nav.pos': 'Register / POS',
   'nav.restaurant': 'Tables & Floor',
   'nav.kds': 'Kitchen (KDS)',
@@ -108,7 +108,7 @@ const enTranslations: Translations = {
   'returns.process_btn': 'Process Return & Issue Refund',
 
   // Licensing
-  'lic.title': 'OmniPOS Commercial License',
+  'lic.title': 'Vendra Commercial License',
   'lic.status': 'License Status',
   'lic.days_remaining': 'Days Remaining',
   'lic.activate_key': 'Activate License Key',

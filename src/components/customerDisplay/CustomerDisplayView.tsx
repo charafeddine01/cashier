@@ -16,7 +16,7 @@ interface Props {
 
 export const CustomerDisplayView: React.FC<Props> = ({ settings }) => {
   const [displayData, setDisplayData] = useState<CustomerDisplayPayload>({
-    companyName: settings?.company_name || 'OmniPOS SuperStore',
+    companyName: settings?.company_name || 'Vendra SuperStore',
     primaryCurrencySymbol: settings?.primary_currency_symbol || '$',
     secondaryCurrencySymbol: settings?.secondary_currency_symbol || '€',
     secondaryRate: settings?.secondary_currency_rate || 0.92,
@@ -173,7 +173,7 @@ export const CustomerDisplayView: React.FC<Props> = ({ settings }) => {
 
       {/* Footer */}
       <footer className="text-center text-xs text-slate-500 pt-2 border-t border-slate-800/80">
-        Thank you for shopping at {displayData.companyName} • Powered by OmniPOS Pro Commercial POS
+        Thank you for shopping at {displayData.companyName} • Powered by Vendra POS Commercial System
       </footer>
     </div>
   );

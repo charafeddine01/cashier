@@ -27,15 +27,15 @@ import { LoginView } from './components/auth/LoginView';
 
 const DEFAULT_SETTINGS: CompanySettings = {
   id: 1,
-  company_name: 'OmniPOS Pro',
-  company_name_ar: 'أومني بوس برو',
+  company_name: 'Vendra POS',
+  company_name_ar: 'فيندرا بي أو إس',
   tax_id: 'TAX-00000000',
   address: 'Commercial POS Station',
   phone: '+1 (800) 555-0100',
-  email: 'contact@omnipos-store.local',
-  website: 'https://omnipos-store.local',
-  primary_color: '#2563eb',
-  secondary_color: '#10b981',
+  email: 'contact@vendra.charafeddine.xyz',
+  website: 'https://vendra.charafeddine.xyz',
+  primary_color: '#10b981',
+  secondary_color: '#6366f1',
   theme_mode: 'light',
   business_mode: 'SUPERMARKET',
   primary_currency_code: 'USD',
@@ -174,8 +174,8 @@ export const App: React.FC = () => {
   if (!isInitialized) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-xs text-slate-400 font-mono tracking-wider uppercase">Initializing OmniPOS Pro 2.0...</p>
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-xs text-slate-400 font-mono tracking-wider uppercase">Initializing Vendra POS...</p>
       </div>
     );
   }

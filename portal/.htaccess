@@ -1,0 +1,47 @@
+# Vendra Commercial Showcase & License Server - Apache / LiteSpeed / cPanel .htaccess
+# Official Domain: vendra.charafeddine.xyz
+
+Options -Indexes
+Options +FollowSymLinks
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Security: Protect sensitive backend directories and database files
+    RewriteRule ^database/ - [F,L]
+    RewriteRule ^config/ - [F,L]
+    RewriteRule \.(sql|sqlite|sqlite3|db|env|log|key)$ - [F,L]
+
+    # Route all license API calls to license-api/index.php
+    RewriteRule ^license-api/(.*)$ license-api/index.php [QSA,L]
+
+    # Web Installer direct access
+    RewriteRule ^install/(.*)$ install/$1 [L]
+    RewriteRule ^install$ install/ [R=301,L]
+
+    # Uploads direct access
+    RewriteRule ^uploads/(.*)$ uploads/$1 [L]
+
+    # Serve static files if they exist (index.html, robots.txt, favicon, etc.)
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Fallback to index.html for showcase single page navigation
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^.*$ index.html [L]
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Gzip / Brotli Compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE application/javascript application/json text/css text/html text/plain text/xml image/svg+xml
+</IfModule>

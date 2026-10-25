@@ -107,7 +107,7 @@ export const LoginView: React.FC<Props> = ({ settings, onLoginSuccess }) => {
           )}
 
           <h1 className="text-xl font-black text-white tracking-tight">
-            {settings?.company_name || 'OmniPOS Pro'}
+            {settings?.company_name || 'Vendra POS'}
           </h1>
           <p className="text-xs text-slate-400 mt-0.5">Commercial Cashier & Terminal Gateway</p>
         </div>
@@ -256,7 +256,7 @@ export const LoginView: React.FC<Props> = ({ settings, onLoginSuccess }) => {
 
         {/* Footer info */}
         <div className="mt-6 text-center text-[10px] text-slate-500 font-mono">
-          OmniPOS Pro 2.0 • Ed25519 Verified • 100% POST Protocol
+          Vendra POS • Ed25519 Verified • 100% POST Protocol
         </div>
       </div>
     </div>

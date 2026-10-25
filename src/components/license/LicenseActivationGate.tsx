@@ -25,6 +25,7 @@ export const LicenseActivationGate: React.FC<Props> = ({ onLicenseActivated }) =
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [copiedFingerprint, setCopiedFingerprint] = useState(false);
 
   const fetchStatus = async () => {
     setLoading(true);
@@ -73,17 +74,22 @@ export const LicenseActivationGate: React.FC<Props> = ({ onLicenseActivated }) =
       <div className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-xl p-8 shadow-2xl relative">
         {/* Header Icon */}
         <div className="text-center mb-6">
-          <div className={`w-16 h-16 rounded-3xl mx-auto flex items-center justify-center text-3xl mb-3 shadow-xl ${
-            isTampered
-              ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-rose-500/20 animate-bounce'
-              : isActive
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-emerald-500/20'
-              : 'bg-amber-500/20 text-amber-400 border border-amber-500/40 shadow-amber-500/20'
-          }`}>
-            {isTampered ? <AlertTriangle className="w-8 h-8" /> : isActive ? <ShieldCheck className="w-8 h-8" /> : <KeyRound className="w-8 h-8" />}
+          <div className="w-16 h-16 rounded-3xl mx-auto flex items-center justify-center text-3xl mb-3 shadow-xl bg-gradient-to-tr from-emerald-500 to-indigo-600 text-white font-black shadow-emerald-500/20">
+            V
           </div>
-          <h2 className="text-2xl font-black text-white">{I18nService.t('lic.title')}</h2>
+          <h2 className="text-2xl font-black text-white">Vendra POS License Activation</h2>
           <p className="text-xs text-slate-400 mt-1">4-Layer Tamper-Resistant Ed25519 Commercial License Guard</p>
+          <div className="mt-2">
+            <a
+              href="https://vendra.charafeddine.xyz"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full"
+            >
+              <span>Need a license? Purchase or renew at vendra.charafeddine.xyz</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
         </div>
 
         {/* Security Warning Banners */}
@@ -141,12 +147,14 @@ export const LicenseActivationGate: React.FC<Props> = ({ onLicenseActivated }) =
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(licenseStatus.installation_fingerprint);
-                    alert('Copied installation fingerprint!');
+                    setCopiedFingerprint(true);
+                    setTimeout(() => setCopiedFingerprint(false), 2000);
                   }}
-                  className="text-slate-400 hover:text-white p-1"
+                  className="text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800 text-[10px] font-bold flex items-center gap-1"
                   title="Copy Fingerprint"
                 >
-                  <Copy className="w-3.5 h-3.5" />
+                  {copiedFingerprint ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedFingerprint ? 'Copied!' : 'Copy'}</span>
                 </button>
               </div>
             </div>

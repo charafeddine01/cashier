@@ -102,7 +102,7 @@ export const TopBar: React.FC<Props> = ({
 
         <div>
           <h1 className="font-bold text-sm tracking-tight leading-none text-white flex items-center gap-2">
-            <span>{lang === 'ar' && settings?.company_name_ar ? settings.company_name_ar : (settings?.company_name || 'OmniPOS Pro')}</span>
+            <span>{lang === 'ar' && settings?.company_name_ar ? settings.company_name_ar : (settings?.company_name || 'Vendra POS')}</span>
           </h1>
           <span className="text-[10px] text-slate-400 font-mono tracking-wide">
             {settings?.tax_id ? `TAX: ${settings.tax_id}` : 'Universal Cashier System'}

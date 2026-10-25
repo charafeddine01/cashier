@@ -1,6 +1,6 @@
 {
-  "short_name": "OmniPOS Pro",
-  "name": "OmniPOS Pro - Universal Commercial Cashier & POS",
+  "short_name": "Vendra",
+  "name": "Vendra POS — Universal Cashier System",
   "description": "Commercial-grade universal point of sale application with offline sync and peripheral integration.",
   "icons": [
     {
@@ -23,7 +23,7 @@
   ],
   "start_url": "/",
   "background_color": "#0f172a",
-  "theme_color": "#2563eb",
+  "theme_color": "#10b981",
   "display": "standalone",
   "orientation": "any"
 }

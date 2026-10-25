@@ -29,7 +29,7 @@ return [
 
     // Vendor Asymmetric Licensing (Ed25519)
     'vendor_public_key_hex' => $customEnv['vendor_public_key_hex'] ?? '7cba51469668791a660ee64c5815922b0349dc4e74ae39e2cc9c5d232dacbcf4',
-    'central_license_url'   => $customEnv['central_license_url'] ?? 'https://licensing.omnipos-pro.com/api/heartbeat',
+    'central_license_url'   => $customEnv['central_license_url'] ?? 'https://vendra.charafeddine.xyz/license-api/index.php',
 
     // Uploads
     'upload_dir' => __DIR__ . '/../public/uploads',

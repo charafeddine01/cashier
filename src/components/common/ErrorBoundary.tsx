@@ -62,7 +62,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-rose-500/20 text-rose-300">
                   Runtime Error Intercepted
                 </span>
-                <h1 className="text-lg font-black text-white tracking-tight mt-1">OmniPOS Pro Safe Boot Fallback</h1>
+                <h1 className="text-lg font-black text-white tracking-tight mt-1">Vendra POS Safe Boot Fallback</h1>
               </div>
             </div>
 

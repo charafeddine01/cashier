@@ -22,6 +22,7 @@ zip -r -q "$OUTPUT_ZIP" . \
   -x "api/config/installed.lock" \
   -x "api/config/env.php" \
   -x "database/omnipos.sqlite*" \
+  -x "portal/*" \
   -x "*.zip"
 
 echo "=== 3. Release Package Created Successfully ==="

@@ -1,0 +1,12 @@
+# Vendra Central License Authority API Protection
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !index\.php$
+    RewriteRule ^.*$ index.php [QSA,L]
+</IfModule>
+
+<LimitExcept POST OPTIONS>
+    Require all denied
+</LimitExcept>

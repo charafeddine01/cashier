@@ -11,6 +11,7 @@ class LicenseGuard
     private static ?array $cachedLicense = null;
     private static string $vendorPublicKeyHex = '7cba51469668791a660ee64c5815922b0349dc4e74ae39e2cc9c5d232dacbcf4';
     private static string $securitySalt = 'OMNIPOS_CORE_SALT_2026_SECURE';
+    private static string $centralLicenseUrl = 'https://vendra.charafeddine.xyz/license-api/index.php';
 
     public static function init(array $config): void
     {
@@ -19,6 +20,9 @@ class LicenseGuard
         }
         if (!empty($config['security_salt'])) {
             self::$securitySalt = $config['security_salt'];
+        }
+        if (!empty($config['central_license_url'])) {
+            self::$centralLicenseUrl = $config['central_license_url'];
         }
     }
 

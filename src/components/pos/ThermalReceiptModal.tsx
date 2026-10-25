@@ -29,7 +29,7 @@ export const ThermalReceiptModal: React.FC<Props> = ({
 
   const handleEscPosRawPrint = async () => {
     const rawBytes = HardwareService.generateEscPosBytes({
-      companyName: settings?.company_name || 'OmniPOS Store',
+      companyName: settings?.company_name || 'Vendra Store',
       invoiceNumber: order.invoice_number,
       dateStr: order.created_at || new Date().toISOString(),
       cashierName: order.cashier_name || 'Staff',
@@ -92,7 +92,7 @@ export const ThermalReceiptModal: React.FC<Props> = ({
             {/* Header */}
             <div className="text-center border-b border-black pb-2 mb-2">
               <h1 className="font-black text-sm uppercase tracking-wide">
-                {settings?.company_name || 'OmniPOS Pro'}
+                {settings?.company_name || 'Vendra POS'}
               </h1>
               {settings?.address && <p className="text-[10px] mt-0.5">{settings.address}</p>}
               {settings?.phone && <p className="text-[10px]">Tel: {settings.phone}</p>}
@@ -186,7 +186,7 @@ export const ThermalReceiptModal: React.FC<Props> = ({
             {/* Footer Notice */}
             <div className="text-center text-[9px] text-gray-700 space-y-0.5">
               <p>{settings?.receipt_footer || 'Thank you for your patronage!'}</p>
-              <p>Powered by OmniPOS Pro</p>
+              <p>Powered by Vendra POS</p>
             </div>
           </div>
         </div>

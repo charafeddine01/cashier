@@ -57,6 +57,31 @@ if (str_starts_with($uri, '/api')) {
     exit;
 }
 
+// 1b. Central License Authority API Routing (/license-api or /portal/license-api)
+if (str_starts_with($uri, '/license-api') || str_starts_with($uri, '/portal/license-api')) {
+    require __DIR__ . '/portal/license-api/index.php';
+    exit;
+}
+
+// 1c. Portal Installer (/portal/install)
+if (str_starts_with($uri, '/portal/install')) {
+    require __DIR__ . '/portal/install/index.php';
+    exit;
+}
+
+// 1d. Portal Showcase Site & Assets (/portal)
+if ($uri === '/portal' || $uri === '/portal/') {
+    serveStaticFile(__DIR__ . '/portal/index.html');
+}
+if (str_starts_with($uri, '/portal/')) {
+    $portalFilePath = __DIR__ . $uri;
+    if (is_file($portalFilePath)) {
+        serveStaticFile($portalFilePath);
+    }
+    // Fallback for portal subroutes
+    serveStaticFile(__DIR__ . '/portal/index.html');
+}
+
 // 2. Vendor License Manager Tool
 if (str_starts_with($uri, '/vendor-license-manager')) {
     $filePath = __DIR__ . $uri;

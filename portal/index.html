@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendra POS — Universal Commercial Cashier & Point of Sale System</title>
+  <meta name="description" content="Commercial-grade Universal POS for Supermarkets, Restaurants, Retail and Pharmacies. Runs on any shared hosting (PHP 8.2+ / MySQL) and mobile.">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Cairo for Arabic, Inter for Latin -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            arabic: ['Cairo', 'sans-serif'],
+          },
+          colors: {
+            vendra: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            },
+            brand: {
+              emerald: '#10b981',
+              indigo: '#6366f1',
+              slate: '#0f172a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    html[dir="rtl"] body { font-family: 'Cairo', sans-serif; }
+    .hero-glow {
+      background: radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.15) 0%, rgba(99, 102, 241, 0.1) 40%, transparent 70%);
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- ==========================================
+       TOP NAVIGATION BAR
+       ========================================== -->
+  <header class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-indigo-600 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition">
+          V
+        </div>
+        <div>
+          <span class="font-black text-xl tracking-tight text-white flex items-center gap-2">
+            <span>Vendra</span>
+            <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">POS</span>
+          </span>
+          <p class="text-[10px] text-slate-400 font-medium">Universal Cashier Engine</p>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center gap-8 text-xs font-bold text-slate-300">
+        <a href="#screenshots" class="hover:text-emerald-400 transition" data-i18n="nav.screenshots">Screenshots & Simulator</a>
+        <a href="#customizer" class="hover:text-emerald-400 transition" data-i18n="nav.customizer">Brand Customizer</a>
+        <a href="#features" class="hover:text-emerald-400 transition" data-i18n="nav.features">Feature Matrix</a>
+        <a href="#pricing" class="hover:text-emerald-400 transition" data-i18n="nav.pricing">Pricing Plans</a>
+      </nav>
+
+      <!-- Action Buttons & Language Switcher -->
+      <div class="flex items-center gap-3">
+        <!-- Language Switcher -->
+        <button
+          onclick="toggleLanguage()"
+          id="lang-btn"
+          class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-200 transition flex items-center gap-1.5"
+          title="Toggle English / Arabic"
+        >
+          <i data-lucide="globe" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span id="lang-label">العربية</span>
+        </button>
+
+        <!-- Admin Portal Trigger -->
+        <button
+          onclick="openAdminModal()"
+          class="hidden sm:flex px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white transition items-center gap-1.5"
+          title="Vendra Vault License Authority"
+        >
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span>Vendra Vault</span>
+        </button>
+
+        <!-- CTA Order Button -->
+        <a
+          href="#pricing"
+          class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs transition shadow-lg shadow-emerald-500/25 flex items-center gap-1.5"
+          data-i18n="nav.cta"
+        >
+          <span>Get License</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       HERO SECTION
+       ========================================== -->
+  <section class="relative pt-20 pb-28 overflow-hidden hero-glow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-8">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold shadow-lg shadow-emerald-500/10 animate-pulse">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span data-i18n="hero.badge">Commercial Cashier System 2.0 &bull; Shared-Hosting Native</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-tight max-w-5xl mx-auto" data-i18n="hero.title">
+        The Universal POS Engine Built for Every Business
+      </h1>
+
+      <!-- Subheadline -->
+      <p class="text-base sm:text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed" data-i18n="hero.desc">
+        Deployable on any standard shared hosting provider (hosting.com / cPanel / LiteSpeed with pure PHP 8.2+ and MySQL). Transformable into native Android & iOS apps with zero Node.js server daemons or root SSH required.
+      </p>
+
+      <!-- CTA Action Group -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+        <a
+          href="#screenshots"
+          class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm transition shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2 group"
+        >
+          <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+          <span data-i18n="hero.try_demo">Try Live POS Simulator</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+        </a>
+
+        <a
+          href="#customizer"
+          class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-white font-bold text-sm transition flex items-center justify-center gap-2"
+        >
+          <i data-lucide="palette" class="w-4 h-4 text-emerald-400"></i>
+          <span data-i18n="hero.white_label">Test White-Label Brand</span>
+        </a>
+      </div>
+
+      <!-- Live Technical Metrics Strip -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-10 text-left">
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+          <div class="text-emerald-400 font-black text-2xl font-mono">&lt;15ms</div>
+          <div class="text-xs text-slate-400 font-semibold" data-i18n="metric.scan">Barcode Scan Speed</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+          <div class="text-indigo-400 font-black text-2xl font-mono">100% POST</div>
+          <div class="text-xs text-slate-400 font-semibold" data-i18n="metric.post">JSON-RPC Protocol</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+          <div class="text-teal-400 font-black text-2xl font-mono">Ed25519</div>
+          <div class="text-xs text-slate-400 font-semibold" data-i18n="metric.crypto">Asymmetric Licensing</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+          <div class="text-amber-400 font-black text-2xl font-mono">PWA + APK</div>
+          <div class="text-xs text-slate-400 font-semibold" data-i18n="metric.mobile">Capacitor Mobile Ready</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       INTERACTIVE SCREENSHOTS & TRY-IT-YOURSELF POS SIMULATOR
+       ========================================== -->
+  <section id="screenshots" class="py-24 bg-slate-900/50 border-y border-slate-800/80 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-400" data-i18n="tour.tag">Interactive Visual Tour</span>
+        <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight" data-i18n="tour.title">
+          Experience Vendra in Action
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400" data-i18n="tour.desc">
+          Click across the 4 specialized industry screens to inspect high-resolution interfaces and interact with live POS checkout simulations.
+        </p>
+      </div>
+
+      <!-- Industry Tabs Navigation -->
+      <div class="flex items-center justify-center gap-2 overflow-x-auto pb-2">
+        <button onclick="switchScreenTab('supermarket')" id="tab-supermarket" class="px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20 shrink-0">
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+          <span>1. Supermarket & Scales</span>
+        </button>
+        <button onclick="switchScreenTab('restaurant')" id="tab-restaurant" class="px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 hover:text-white shrink-0">
+          <i data-lucide="utensils" class="w-4 h-4"></i>
+          <span>2. Restaurant & KDS</span>
+        </button>
+        <button onclick="switchScreenTab('retail')" id="tab-retail" class="px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 hover:text-white shrink-0">
+          <i data-lucide="tag" class="w-4 h-4"></i>
+          <span>3. Retail & Pharmacy FEFO</span>
+        </button>
+        <button onclick="switchScreenTab('shifts')" id="tab-shifts" class="px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 hover:text-white shrink-0">
+          <i data-lucide="pie-chart" class="w-4 h-4"></i>
+          <span>4. Shifts & Reports</span>
+        </button>
+      </div>
+
+      <!-- Interactive Simulator Display Container -->
+      <div class="bg-slate-950 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+
+        <!-- SCREEN 1: SUPERMARKET SIMULATOR -->
+        <div id="screen-content-supermarket" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left 2 Cols: Interactive Cashier Terminal Simulation -->
+          <div class="lg:col-span-2 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-bold text-white uppercase tracking-wider">Supermarket Speed Register Terminal</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="simulateBarcodeScan()" class="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition flex items-center gap-1.5">
+                  <i data-lucide="barcode" class="w-3.5 h-3.5"></i>
+                  <span>Simulate Barcode Gun Scan</span>
+                </button>
+                <button onclick="openLightbox('supermarket')" class="p-1.5 rounded-lg text-slate-400 hover:text-white bg-slate-900" title="Full Screen Zoom">
+                  <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Scanned Cart Table -->
+            <div class="border border-slate-800 rounded-2xl overflow-hidden bg-slate-900/60">
+              <div class="bg-slate-900 px-4 py-2 border-b border-slate-800 text-[11px] font-bold text-slate-400 grid grid-cols-6">
+                <span class="col-span-3">Item / PLU</span>
+                <span class="text-center">Qty / Weight</span>
+                <span class="text-right">Price</span>
+                <span class="text-right">Total</span>
+              </div>
+              <div id="sim-cart-items" class="divide-y divide-slate-800/60 text-xs custom-scrollbar max-h-56 overflow-y-auto">
+                <div class="px-4 py-2.5 grid grid-cols-6 items-center">
+                  <div class="col-span-3">
+                    <span class="font-bold text-white block">Organic Bananas (Scale PLU #101)</span>
+                    <span class="text-[10px] text-emerald-400 font-mono">Barcode: 2100101015007 (Prefix 21 Weight Embedded)</span>
+                  </div>
+                  <div class="text-center font-mono text-slate-300">1.500 kg</div>
+                  <div class="text-right font-mono text-slate-400">$1.99</div>
+                  <div class="text-right font-mono font-bold text-white">$2.99</div>
+                </div>
+                <div class="px-4 py-2.5 grid grid-cols-6 items-center">
+                  <div class="col-span-3">
+                    <span class="font-bold text-white block">Whole Milk 1L</span>
+                    <span class="text-[10px] text-slate-400 font-mono">Barcode: 890123456789 (Piece/Box Unit)</span>
+                  </div>
+                  <div class="text-center font-mono text-slate-300">2 pcs</div>
+                  <div class="text-right font-mono text-slate-400">$3.49</div>
+                  <div class="text-right font-mono font-bold text-white">$6.98</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dual-Currency Totals Strip -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <span class="text-xs text-slate-400 block font-semibold">Dual-Currency Tender Calculator:</span>
+                <div class="flex items-baseline gap-3 mt-0.5">
+                  <span class="text-3xl font-black text-emerald-400 font-mono" id="sim-total-usd">$9.97 USD</span>
+                  <span class="text-sm font-bold text-slate-400 font-mono" id="sim-total-lbp">≈ 892,300 LBP</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="addSimItem('Organic Avocado', 2.50)" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition">
+                  + Add Avocado
+                </button>
+                <button onclick="clearSimCart()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-rose-400 text-xs font-bold transition">
+                  Clear
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Col: Live Thermal Receipt Preview -->
+          <div class="bg-white text-black p-5 rounded-2xl shadow-2xl font-mono text-xs space-y-2 border border-slate-200 leading-tight">
+            <div class="text-center border-b border-black pb-2">
+              <h4 class="font-black text-sm uppercase tracking-wide" id="receipt-shop-title">Vendra POS SuperStore</h4>
+              <p class="text-[10px] text-gray-600">100 Innovation Blvd &bull; Tel: +1 800-888-POS1</p>
+              <p class="text-[10px] text-gray-600 font-bold">TAX ID: VAT-884920194</p>
+            </div>
+            <div class="text-[10px] flex justify-between">
+              <span>INV: #2026-9941</span>
+              <span>2026-10-25 12:45</span>
+            </div>
+            <div class="border-b border-black pb-2 space-y-1 text-[10px]">
+              <div class="flex justify-between"><span>1.500 kg Bananas</span><span>$2.99</span></div>
+              <div class="flex justify-between"><span>2x Whole Milk 1L</span><span>$6.98</span></div>
+            </div>
+            <div class="pt-1 space-y-0.5 text-right font-bold text-xs">
+              <div class="flex justify-between"><span>Subtotal:</span><span>$9.97</span></div>
+              <div class="flex justify-between"><span>VAT (10%):</span><span>$0.99</span></div>
+              <div class="flex justify-between text-sm font-black pt-1 border-t border-black"><span>TOTAL:</span><span>$10.96</span></div>
+              <div class="text-[10px] text-gray-600 flex justify-between"><span>LBP Rate (89,500):</span><span>980,920 LBP</span></div>
+            </div>
+            <div class="text-center pt-3 text-[9px] text-gray-600">
+              <p>Thank you for shopping at Vendra POS!</p>
+              <p class="font-bold text-black mt-0.5">* ESC/POS Thermal 80mm *</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCREEN 2: RESTAURANT & KDS SIMULATOR -->
+        <div id="screen-content-restaurant" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center gap-2">
+                <i data-lucide="layout-grid" class="w-4 h-4 text-emerald-400"></i>
+                <span class="text-xs font-bold text-white uppercase tracking-wider">Interactive Dining Room Table Map</span>
+              </div>
+              <span class="text-xs text-slate-400">Click any table to cycle status</span>
+            </div>
+
+            <!-- Table Map Grid -->
+            <div class="grid grid-cols-4 gap-3">
+              <button onclick="cycleTable(1)" id="table-btn-1" class="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-500/10 text-emerald-400 text-center font-bold text-xs transition">
+                <span class="block text-lg font-black text-white">T-01</span>
+                <span class="text-[10px] uppercase font-bold" id="table-status-1">Available</span>
+              </button>
+              <button onclick="cycleTable(2)" id="table-btn-2" class="p-4 rounded-2xl border-2 border-amber-500 bg-amber-500/10 text-amber-400 text-center font-bold text-xs transition">
+                <span class="block text-lg font-black text-white">T-02</span>
+                <span class="text-[10px] uppercase font-bold" id="table-status-2">Occupied ($42)</span>
+              </button>
+              <button onclick="cycleTable(3)" id="table-btn-3" class="p-4 rounded-2xl border-2 border-blue-500 bg-blue-500/10 text-blue-400 text-center font-bold text-xs transition">
+                <span class="block text-lg font-black text-white">T-03</span>
+                <span class="text-[10px] uppercase font-bold" id="table-status-3">Bill Printed</span>
+              </button>
+              <button onclick="cycleTable(4)" id="table-btn-4" class="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-500/10 text-emerald-400 text-center font-bold text-xs transition">
+                <span class="block text-lg font-black text-white">T-04</span>
+                <span class="text-[10px] uppercase font-bold" id="table-status-4">Available</span>
+              </button>
+              <button onclick="cycleTable(5)" id="table-btn-5" class="p-4 rounded-2xl border-2 border-amber-500 bg-amber-500/10 text-amber-400 text-center font-bold text-xs transition">
+                <span class="block text-lg font-black text-white">T-05</span>
+                <span class="text-[10px] uppercase font-bold" id="table-status-5">Occupied ($85)</span>
+              </button>
+              <button onclick="cycleTable(6)" id="table-btn-6" class="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-500/10 text-emerald-400 text-center font-bold text-xs transition">
+                <span class="block text-lg font-black text-white">T-06</span>
+                <span class="text-[10px] uppercase font-bold" id="table-status-6">Available</span>
+              </button>
+              <button onclick="cycleTable(7)" id="table-btn-7" class="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-500/10 text-emerald-400 text-center font-bold text-xs transition">
+                <span class="block text-lg font-black text-white">T-07</span>
+                <span class="text-[10px] uppercase font-bold" id="table-status-7">Available</span>
+              </button>
+              <button onclick="cycleTable(8)" id="table-btn-8" class="p-4 rounded-2xl border-2 border-purple-500 bg-purple-500/10 text-purple-400 text-center font-bold text-xs transition">
+                <span class="block text-lg font-black text-white">VIP-1</span>
+                <span class="text-[10px] uppercase font-bold" id="table-status-8">Reserved</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Col: Live Kitchen Display (KDS) Ticket -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span class="font-bold text-xs text-amber-400 flex items-center gap-1.5">
+                <i data-lucide="clock" class="w-4 h-4"></i>
+                <span>Live Kitchen Ticket (KOT)</span>
+              </span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">TABLE #02</span>
+            </div>
+            <div class="space-y-2 text-xs">
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                <div class="flex justify-between font-bold text-white">
+                  <span>2x Wagyu Beef Burger</span>
+                  <span class="text-amber-400 font-mono">12m ago</span>
+                </div>
+                <div class="text-[11px] text-emerald-400 mt-1 space-y-0.5">
+                  <div>&bull; Cooking: Medium Rare</div>
+                  <div>&bull; Modifiers: Extra Cheddar, No Onions</div>
+                </div>
+              </div>
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                <div class="flex justify-between font-bold text-white">
+                  <span>1x Truffle Parmesan Fries</span>
+                  <span class="text-emerald-400 font-mono">READY</span>
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">&bull; Dip: Garlic Aioli on side</div>
+              </div>
+            </div>
+            <button class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">
+              Mark Order Ready (Notify Waiter)
+            </button>
+          </div>
+        </div>
+
+        <!-- SCREEN 3: RETAIL & PHARMACY SIMULATOR -->
+        <div id="screen-content-retail" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
+          <!-- Retail Variants & Serial Lookup -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <h4 class="font-bold text-white flex items-center gap-2">
+              <i data-lucide="shirt" class="w-4 h-4 text-emerald-400"></i>
+              <span>Retail Variant Matrix & IMEI Tracking</span>
+            </h4>
+            <div class="space-y-2">
+              <label class="block text-slate-400">Variant Matrix (Size &times; Color):</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button class="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500 text-emerald-400 font-bold text-center">
+                  M / Black (8 In Stock)
+                </button>
+                <button class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 hover:border-slate-700 font-bold text-center">
+                  L / Black (12 In Stock)
+                </button>
+                <button class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-500 font-bold text-center line-through">
+                  XL / Black (Sold Out)
+                </button>
+              </div>
+            </div>
+            <div class="pt-2 border-t border-slate-800 space-y-1">
+              <span class="text-slate-400">Serial Number / IMEI Warranty Log:</span>
+              <div class="bg-slate-950 p-2.5 rounded-xl font-mono text-[11px] text-slate-300 flex justify-between">
+                <span>IMEI-9988221049184</span>
+                <span class="text-emerald-400 font-bold">12 Mo Warranty</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pharmacy FEFO Batch Alerts -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <h4 class="font-bold text-white flex items-center gap-2">
+              <i data-lucide="pill" class="w-4 h-4 text-teal-400"></i>
+              <span>Pharmacy FEFO (First-Expired, First-Out) Deduction</span>
+            </h4>
+            <div class="divide-y divide-slate-800/80 bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
+              <div class="p-3 flex items-center justify-between">
+                <div>
+                  <span class="font-bold text-white block">Amoxicillin 500mg (Batch #AMX-202)</span>
+                  <span class="text-[10px] text-rose-400 font-bold">Expires in 14 Days &bull; FEFO Top Priority</span>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">ALERT</span>
+              </div>
+              <div class="p-3 flex items-center justify-between">
+                <div>
+                  <span class="font-bold text-white block">Paracetamol 500mg (Batch #PAR-881)</span>
+                  <span class="text-[10px] text-emerald-400 font-bold">Expires in 18 Months &bull; Good Stock</span>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">SAFE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCREEN 4: SHIFTS & REPORTS SIMULATOR -->
+        <div id="screen-content-shifts" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
+          <!-- Blind Z-Report Cash Count -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
+            <h4 class="font-bold text-white flex items-center gap-2">
+              <i data-lucide="lock" class="w-4 h-4 text-emerald-400"></i>
+              <span>End-of-Shift Blind Z-Report Cash Drawer Count</span>
+            </h4>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                <span class="text-slate-400 font-bold">$100 Bills:</span>
+                <span class="font-mono font-black text-white">4 ($400)</span>
+              </div>
+              <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                <span class="text-slate-400 font-bold">$50 Bills:</span>
+                <span class="font-mono font-black text-white">8 ($400)</span>
+              </div>
+              <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                <span class="text-slate-400 font-bold">$20 Bills:</span>
+                <span class="font-mono font-black text-white">15 ($300)</span>
+              </div>
+              <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                <span class="text-slate-400 font-bold">$10 Bills:</span>
+                <span class="font-mono font-black text-white">20 ($200)</span>
+              </div>
+            </div>
+            <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
+              <div>
+                <span class="text-slate-400 block text-[11px]">Calculated Drawer Variance:</span>
+                <span class="font-mono font-black text-emerald-400 text-sm">+$0.00 (Balanced Perfect Close)</span>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">VERIFIED</span>
+            </div>
+          </div>
+
+          <!-- Profit & COGS Analytics -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
+            <h4 class="font-bold text-white flex items-center gap-2">
+              <i data-lucide="trending-up" class="w-4 h-4 text-indigo-400"></i>
+              <span>Real-Time Profit & COGS Margins</span>
+            </h4>
+            <div class="space-y-2">
+              <div>
+                <div class="flex justify-between text-[11px] mb-1">
+                  <span class="text-slate-400">Gross Margin</span>
+                  <span class="font-bold text-emerald-400">38.4%</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-950 overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 w-[38%]"></div>
+                </div>
+              </div>
+              <div class="pt-2 grid grid-cols-2 gap-2 text-[11px]">
+                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                  <span class="text-slate-400 block">Today's Net Revenue:</span>
+                  <span class="font-mono font-black text-white text-sm">$3,842.50</span>
+                </div>
+                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                  <span class="text-slate-400 block">Estimated Net Profit:</span>
+                  <span class="font-mono font-black text-emerald-400 text-sm">$1,475.52</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       LIVE WHITE-LABEL CUSTOMIZER PLAYGROUND
+       ========================================== -->
+  <section id="customizer" class="py-24 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-400" data-i18n="cust.tag">Live Playground</span>
+        <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight" data-i18n="cust.title">
+          Customize Vendra for Your Brand
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400" data-i18n="cust.desc">
+          Test Vendra's white-label engine right in your browser. Change the store name, theme color, industry mode, and logo to watch the POS adapt in real time!
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <!-- Left: Control Panel -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 text-xs shadow-2xl">
+          <!-- Shop Name -->
+          <div>
+            <label class="block font-bold text-slate-300 mb-1" data-i18n="cust.shop_name">Store / Brand Name</label>
+            <input
+              type="text"
+              id="cust-shop-name"
+              value="Beirut Gourmet Market"
+              oninput="updateCustomizer()"
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-emerald-500"
+            >
+          </div>
+
+          <!-- Color Palette Picker -->
+          <div>
+            <label class="block font-bold text-slate-300 mb-1.5" data-i18n="cust.brand_color">Primary Brand Palette</label>
+            <div class="flex items-center gap-2">
+              <button onclick="pickColor('#10b981', 'Emerald')" class="w-8 h-8 rounded-full bg-emerald-500 ring-2 ring-white ring-offset-2 ring-offset-slate-900 transition" id="cbtn-emerald"></button>
+              <button onclick="pickColor('#2563eb', 'Royal Blue')" class="w-8 h-8 rounded-full bg-blue-600 transition" id="cbtn-blue"></button>
+              <button onclick="pickColor('#dc2626', 'Crimson')" class="w-8 h-8 rounded-full bg-red-600 transition" id="cbtn-red"></button>
+              <button onclick="pickColor('#f59e0b', 'Amber')" class="w-8 h-8 rounded-full bg-amber-500 transition" id="cbtn-amber"></button>
+              <button onclick="pickColor('#7c3aed', 'Violet')" class="w-8 h-8 rounded-full bg-purple-600 transition" id="cbtn-purple"></button>
+            </div>
+          </div>
+
+          <!-- Business Mode -->
+          <div>
+            <label class="block font-bold text-slate-300 mb-1" data-i18n="cust.biz_mode">Business Industry Mode</label>
+            <select id="cust-mode" onchange="updateCustomizer()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-semibold focus:outline-none focus:border-emerald-500">
+              <option value="SUPERMARKET">Supermarket & Grocery (Fast Barcode + Scale)</option>
+              <option value="RESTAURANT">Restaurant & Cafe (Table Map + KDS)</option>
+              <option value="RETAIL">Retail Boutique (Variant Matrix & IMEI)</option>
+              <option value="PHARMACY">Pharmacy (Batches & FEFO Expiry)</option>
+            </select>
+          </div>
+
+          <!-- Currency -->
+          <div>
+            <label class="block font-bold text-slate-300 mb-1" data-i18n="cust.currency">Primary Tender Currency</label>
+            <select id="cust-currency" onchange="updateCustomizer()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-semibold focus:outline-none focus:border-emerald-500">
+              <option value="USD+LBP">USD ($) + Dual LBP (Lebanese Pound)</option>
+              <option value="EUR">Euro (€)</option>
+              <option value="SAR">Saudi Riyal (SAR / ر.س)</option>
+              <option value="AED">UAE Dirham (AED / د.إ)</option>
+            </select>
+          </div>
+
+          <!-- Logo Upload Test -->
+          <div>
+            <label class="block font-bold text-slate-300 mb-1" data-i18n="cust.upload_logo">Upload Brand Logo (Preview)</label>
+            <input type="file" id="cust-logo-file" accept="image/*" onchange="handleCustLogo(event)" class="text-[11px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-slate-800 file:text-slate-200 file:font-bold hover:file:bg-slate-700">
+          </div>
+        </div>
+
+        <!-- Right: Reactive Live POS Simulation Viewport -->
+        <div class="lg:col-span-2 bg-slate-950 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+          <!-- Top simulated navbar -->
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800" id="sim-pos-header">
+            <div class="flex items-center gap-3">
+              <div id="sim-logo-container" class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-white text-base shadow-lg" style="background-color: #10b981;">
+                B
+              </div>
+              <div>
+                <h3 id="sim-display-name" class="font-black text-white text-sm">Beirut Gourmet Market</h3>
+                <p id="sim-mode-tag" class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Supermarket Mode Active</p>
+              </div>
+            </div>
+            <div class="text-right font-mono text-xs">
+              <span class="text-slate-400 block text-[10px]">Tender Currency:</span>
+              <span id="sim-currency-tag" class="font-bold text-white">$ USD + LBP</span>
+            </div>
+          </div>
+
+          <!-- Simulated POS Terminal Body -->
+          <div class="grid grid-cols-2 gap-4 text-xs pt-2">
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-2">
+              <span class="text-slate-400 font-bold uppercase tracking-wider text-[10px] block">Active Terminal Session</span>
+              <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex justify-between">
+                <span class="font-bold text-white">Item #1: Fresh Croissant</span>
+                <span class="font-mono text-emerald-400 font-bold">$2.50</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex justify-between">
+                <span class="font-bold text-white">Item #2: Arabica Coffee 250g</span>
+                <span class="font-mono text-emerald-400 font-bold">$6.00</span>
+              </div>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between">
+              <div>
+                <span class="text-slate-400 font-bold uppercase tracking-wider text-[10px] block">Receipt Branding Preview</span>
+                <div class="mt-2 text-center border border-dashed border-slate-700 p-3 rounded-xl bg-slate-950 font-mono text-[11px]">
+                  <div class="font-black text-white" id="sim-receipt-brand">Beirut Gourmet Market</div>
+                  <div class="text-[9px] text-slate-400">Universal POS Tax Invoice</div>
+                  <div class="text-emerald-400 font-bold mt-1">TOTAL: $8.50</div>
+                </div>
+              </div>
+              <button id="sim-pay-btn" class="w-full py-2.5 rounded-xl text-slate-950 font-black text-xs transition mt-3" style="background-color: #10b981;">
+                Checkout & Print Receipt
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       FEATURE MATRIX SECTION
+       ========================================== -->
+  <section id="features" class="py-24 bg-slate-900/50 border-y border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-400" data-i18n="feat.tag">Engineered for Success</span>
+        <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight" data-i18n="feat.title">
+          Every Advantage Built In
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400" data-i18n="feat.desc">
+          Compare Vendra against conventional legacy POS software. Designed specifically for low cost, zero maintenance, and total reliability.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-xs">
+        <!-- Feature 1 -->
+        <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <i data-lucide="server" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white" data-i18n="feat1.title">Any Shared Hosting Native</h3>
+          <p class="text-slate-400 leading-relaxed" data-i18n="feat1.desc">
+            Runs on any $2/month cPanel, hosting.com, or Apache host. Pure PHP 8.2+ with PDO MySQL prepared statements and zero Node.js daemon requirements.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <i data-lucide="smartphone" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white" data-i18n="feat2.title">PWA & Capacitor Mobile App</h3>
+          <p class="text-slate-400 leading-relaxed" data-i18n="feat2.desc">
+            Installs as a progressive web app or transforms directly into native Android APK/AAB and iOS IPA with hardware camera barcode scanning.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400">
+            <i data-lucide="wifi-off" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white" data-i18n="feat3.title">Offline-First IndexedDB</h3>
+          <p class="text-slate-400 leading-relaxed" data-i18n="feat3.desc">
+            Local catalog caching delivers &lt;15ms barcode lookups. Encrypted outbox with UUID idempotency queues orders seamlessly during network outages.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <i data-lucide="printer" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white" data-i18n="feat4.title">Hardware Plug & Play</h3>
+          <p class="text-slate-400 leading-relaxed" data-i18n="feat4.desc">
+            WebSerial/WebUSB ESC/POS thermal printing (58mm/80mm), cash drawer kick pulse, USB/Bluetooth barcode guns, and dual-screen pole display sync.
+          </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white" data-i18n="feat5.title">Unhackable Ed25519 Licensing</h3>
+          <p class="text-slate-400 leading-relaxed" data-i18n="feat5.desc">
+            4-layer defense combining asymmetric Ed25519 cryptography, domain binding, monotonic clock rollback lock, and vendra.charafeddine.xyz central heartbeats.
+          </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+            <i data-lucide="globe" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white" data-i18n="feat6.title">Bilingual RTL / LTR Ready</h3>
+          <p class="text-slate-400 leading-relaxed" data-i18n="feat6.desc">
+            Full native Arabic (RTL) and English (LTR) language dictionary with dual-currency cash tenders (USD + LBP/SAR/EUR/AED) and tax compliance.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       PRICING TIERS & LEAD CAPTURE
+       ========================================== -->
+  <section id="pricing" class="py-24 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-400" data-i18n="price.tag">Commercial Licensing</span>
+        <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight" data-i18n="price.title">
+          Simple, Transparent Pricing
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400" data-i18n="price.desc">
+          Choose between affordable monthly subscriptions or permanent lifetime licenses for your shop.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <!-- Starter Tier -->
+        <div class="p-8 rounded-3xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Starter Shop</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-4xl font-black text-white">$19</span>
+              <span class="text-xs text-slate-400 font-semibold">/ month</span>
+            </div>
+            <p class="text-xs text-slate-400">Ideal for small retail shops, single-lane groceries, and quick-serve kiosks.</p>
+            <div class="pt-4 border-t border-slate-800 space-y-2 text-xs text-slate-300">
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>1 Active Register Terminal</span></div>
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>Standard Barcode Scanning</span></div>
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>58mm/80mm Thermal Receipts</span></div>
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>Shift X/Z Blind Drawer Reports</span></div>
+            </div>
+          </div>
+          <button onclick="openLeadModal('Starter Shop', '$19/mo')" class="w-full py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition">
+            Request Starter License
+          </button>
+        </div>
+
+        <!-- Business Pro Tier (Featured) -->
+        <div class="p-8 rounded-3xl bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500 shadow-2xl shadow-emerald-500/10 flex flex-col justify-between space-y-6 relative">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-[10px] uppercase tracking-wider">
+            Most Popular
+          </div>
+          <div class="space-y-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Business Pro</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-4xl font-black text-white">$49</span>
+              <span class="text-xs text-slate-400 font-semibold">/ month</span>
+            </div>
+            <p class="text-xs text-slate-400">For supermarkets, busy restaurants, pharmacies, and high-volume retail.</p>
+            <div class="pt-4 border-t border-slate-800 space-y-2 text-xs text-slate-300">
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>Up to 5 Synchronized Terminals</span></div>
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>Restaurant Table Map & KDS Screen</span></div>
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>Supermarket Scale Barcode Parser</span></div>
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>Pharmacy FEFO Batch Expiry Tracker</span></div>
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>Offline IndexedDB Outbox Queue</span></div>
+            </div>
+          </div>
+          <button onclick="openLeadModal('Business Pro', '$49/mo')" class="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition shadow-lg shadow-emerald-500/25">
+            Order Business Pro License &rarr;
+          </button>
+        </div>
+
+        <!-- Enterprise Multi-Branch Tier -->
+        <div class="p-8 rounded-3xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Enterprise Multi-Branch</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-4xl font-black text-white">Custom</span>
+            </div>
+            <p class="text-xs text-slate-400">For supermarket chains, franchise restaurants, and multi-warehouse enterprises.</p>
+            <div class="pt-4 border-t border-slate-800 space-y-2 text-xs text-slate-300">
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>Unlimited Register Terminals</span></div>
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>Multi-Branch Inventory Transfers</span></div>
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>Full Custom White-Label Branding</span></div>
+              <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>Dedicated Signed Ed25519 Keys</span></div>
+            </div>
+          </div>
+          <button onclick="openLeadModal('Enterprise Multi-Branch', 'Custom')" class="w-full py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition">
+            Contact for Enterprise Quote
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       FOOTER
+       ========================================== -->
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-12 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-indigo-600 flex items-center justify-center font-black text-white text-sm">V</div>
+        <span class="font-bold text-slate-300">Vendra POS &bull; vendra.charafeddine.xyz</span>
+      </div>
+      <div class="text-center sm:text-right">
+        <p>Commercial Cashier System & Central License Authority &bull; Hosted on hosting.com</p>
+        <p class="text-[10px] text-slate-600 mt-1">100% POST Protocol &bull; Ed25519 Asymmetric Verification &bull; InnoDB DECIMAL(15,4)</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================
+       MODAL 1: ORDER / DEMO LEAD CAPTURE MODAL
+       ========================================== -->
+  <div id="lead-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl relative space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h3 class="font-extrabold text-white text-lg" data-i18n="modal.order_title">Request Vendra License / Demo</h3>
+          <p class="text-xs text-slate-400 mt-0.5" id="modal-selected-tier">Business Pro Plan</p>
+        </div>
+        <button onclick="closeLeadModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="lead-form" onsubmit="submitLeadForm(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1" data-i18n="modal.shop_name">Store / Shop Name *</label>
+            <input type="text" id="lead-shop" required placeholder="e.g. Al-Aman Supermarket" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1" data-i18n="modal.contact_name">Your Name *</label>
+            <input type="text" id="lead-name" required placeholder="e.g. Charafeddine" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1" data-i18n="modal.phone">WhatsApp / Phone *</label>
+            <input type="tel" id="lead-phone" required placeholder="+961 70 000 000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1" data-i18n="modal.email">Email Address</label>
+            <input type="email" id="lead-email" placeholder="contact@shop.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1" data-i18n="modal.industry">Business Industry</label>
+            <select id="lead-industry" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+              <option value="SUPERMARKET">Supermarket & Grocery</option>
+              <option value="RESTAURANT">Restaurant / Cafe</option>
+              <option value="RETAIL">Retail Boutique</option>
+              <option value="PHARMACY">Pharmacy</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1" data-i18n="modal.terminals">Terminals Required</label>
+            <input type="number" id="lead-terminals" min="1" max="50" value="1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1" data-i18n="modal.notes">Notes / Special Requirements</label>
+          <textarea id="lead-notes" rows="2" placeholder="e.g., We have 2 barcode scales and 3 receipt printers..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+        </div>
+
+        <div id="lead-status-box" class="hidden p-3 rounded-xl text-xs"></div>
+
+        <div class="pt-2 flex flex-col sm:flex-row items-center gap-3">
+          <button type="submit" id="lead-submit-btn" class="w-full py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition shadow-lg shadow-emerald-500/20">
+            Submit Request &rarr;
+          </button>
+          <a
+            id="lead-whatsapp-btn"
+            href="https://wa.me/?text=Hello!%20I%20would%20like%20to%20order%20Vendra%20POS."
+            target="_blank"
+            rel="noreferrer"
+            class="w-full py-3 rounded-2xl bg-emerald-600/10 hover:bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 font-bold text-xs transition flex items-center justify-center gap-2"
+          >
+            <i data-lucide="message-circle" class="w-4 h-4"></i>
+            <span>Chat on WhatsApp Directly</span>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 2: VENDRA VAULT VENDOR ADMIN DASHBOARD
+       ========================================== -->
+  <div id="admin-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden">
+      <!-- Admin Top Bar -->
+      <div class="flex items-center justify-between p-6 border-b border-slate-800 bg-slate-950/60 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-sm">Vendra Vault Central License Server</h3>
+            <p class="text-[10px] text-slate-400 font-mono">vendra.charafeddine.xyz/license-api/</p>
+          </div>
+        </div>
+        <button onclick="closeAdminModal()" class="text-slate-400 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Admin Body -->
+      <div id="admin-login-view" class="p-8 text-center space-y-4 max-w-md mx-auto my-auto">
+        <h4 class="font-black text-white text-base">Vendor Master Access</h4>
+        <p class="text-xs text-slate-400">Enter your Vendor Master Password to manage client licenses and inspect heartbeats.</p>
+        <input type="password" id="admin-pass-input" placeholder="VendorMasterPassword2026!" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white font-mono text-xs text-center focus:outline-none focus:border-indigo-500">
+        <button onclick="authenticateAdmin()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition">
+          Unlock Vendra Vault
+        </button>
+      </div>
+
+      <!-- Admin Authenticated Workspace -->
+      <div id="admin-workspace-view" class="hidden flex-1 overflow-y-auto p-6 space-y-6 text-xs">
+        <!-- Subnav -->
+        <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+          <button onclick="switchAdminSubtab('licenses')" id="atab-lic" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white font-bold">Licenses</button>
+          <button onclick="switchAdminSubtab('generator')" id="atab-gen" class="px-3.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold">Issue New License</button>
+          <button onclick="switchAdminSubtab('leads')" id="atab-lead" class="px-3.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold">Inbound Leads</button>
+          <button onclick="switchAdminSubtab('heartbeats')" id="atab-hb" class="px-3.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold">Live Heartbeats</button>
+        </div>
+
+        <!-- Section 1: Licenses Registry -->
+        <div id="admin-section-licenses" class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-300">Active Client Licenses Registry</span>
+            <button onclick="fetchAdminLicenses()" class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:text-white text-[10px]">Refresh</button>
+          </div>
+          <div class="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950">
+            <div id="admin-licenses-list" class="divide-y divide-slate-800/80">
+              <div class="p-4 text-center text-slate-500">Loading licenses...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: License Generator Form -->
+        <div id="admin-section-generator" class="hidden space-y-4">
+          <div class="border border-slate-800 rounded-2xl p-5 bg-slate-950 space-y-4">
+            <h5 class="font-bold text-white text-xs">Generate Asymmetric Ed25519 Client License</h5>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-slate-400 mb-1">Customer / Shop Name</label>
+                <input type="text" id="gen-cname" value="Al-Aman Supermarket" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white">
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Allowed Domain(s)</label>
+                <input type="text" id="gen-domains" value="*, localhost" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono">
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Plan Tier</label>
+                <select id="gen-tier" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                  <option value="BUSINESS_PRO">BUSINESS_PRO</option>
+                  <option value="STARTER">STARTER</option>
+                  <option value="ENTERPRISE">ENTERPRISE</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Validity (Days)</label>
+                <input type="number" id="gen-days" value="365" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white">
+              </div>
+            </div>
+            <button onclick="generateClientLicense()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition">
+              Issue & Download license.key
+            </button>
+            <div id="gen-output" class="hidden p-3 rounded-xl bg-slate-900 border border-slate-800 text-[10px] font-mono break-all select-all"></div>
+          </div>
+        </div>
+
+        <!-- Section 3: Inbound Leads Inbox -->
+        <div id="admin-section-leads" class="hidden space-y-3">
+          <span class="font-bold text-slate-300">Customer Demo Requests & Leads</span>
+          <div id="admin-leads-list" class="border border-slate-800 rounded-2xl bg-slate-950 divide-y divide-slate-800">
+            <div class="p-4 text-center text-slate-500">Loading leads...</div>
+          </div>
+        </div>
+
+        <!-- Section 4: Live Heartbeats -->
+        <div id="admin-section-heartbeats" class="hidden space-y-3">
+          <span class="font-bold text-slate-300">Connected Shop Heartbeats (6-Hour Automated Verification)</span>
+          <div id="admin-heartbeats-list" class="border border-slate-800 rounded-2xl bg-slate-950 divide-y divide-slate-800 font-mono text-[11px]">
+            <div class="p-4 text-center text-slate-500">Loading heartbeats...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       JAVASCRIPT ENGINE (Bilingual & Interactivity)
+       ========================================== -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // 1. Full Bilingual Dictionary
+    let currentLang = 'en';
+    const translations = {
+      en: {
+        'nav.screenshots': 'Screenshots & Simulator',
+        'nav.customizer': 'Brand Customizer',
+        'nav.features': 'Feature Matrix',
+        'nav.pricing': 'Pricing Plans',
+        'nav.cta': 'Get License',
+        'hero.badge': 'Commercial Cashier System 2.0 • Shared-Hosting Native',
+        'hero.title': 'The Universal POS Engine Built for Every Business',
+        'hero.desc': 'Deployable on any standard shared hosting provider (hosting.com / cPanel / LiteSpeed with pure PHP 8.2+ and MySQL). Transformable into native Android & iOS apps with zero Node.js server daemons or root SSH required.',
+        'hero.try_demo': 'Try Live POS Simulator',
+        'hero.white_label': 'Test White-Label Brand',
+        'metric.scan': 'Barcode Scan Speed',
+        'metric.post': 'JSON-RPC Protocol',
+        'metric.crypto': 'Asymmetric Licensing',
+        'metric.mobile': 'Capacitor Mobile Ready',
+        'tour.tag': 'Interactive Visual Tour',
+        'tour.title': 'Experience Vendra in Action',
+        'tour.desc': 'Click across the 4 specialized industry screens to inspect high-resolution interfaces and interact with live POS checkout simulations.',
+        'cust.tag': 'Live Playground',
+        'cust.title': 'Customize Vendra for Your Brand',
+        'cust.desc': "Test Vendra's white-label engine right in your browser. Change the store name, theme color, industry mode, and logo to watch the POS adapt in real time!",
+        'cust.shop_name': 'Store / Brand Name',
+        'cust.brand_color': 'Primary Brand Palette',
+        'cust.biz_mode': 'Business Industry Mode',
+        'cust.currency': 'Primary Tender Currency',
+        'cust.upload_logo': 'Upload Brand Logo (Preview)',
+        'feat.tag': 'Engineered for Success',
+        'feat.title': 'Every Advantage Built In',
+        'feat.desc': 'Compare Vendra against conventional legacy POS software. Designed specifically for low cost, zero maintenance, and total reliability.',
+        'price.tag': 'Commercial Licensing',
+        'price.title': 'Simple, Transparent Pricing',
+        'price.desc': 'Choose between affordable monthly subscriptions or permanent lifetime licenses for your shop.',
+        'modal.order_title': 'Request Vendra License / Demo',
+        'modal.shop_name': 'Store / Shop Name *',
+        'modal.contact_name': 'Your Name *',
+        'modal.phone': 'WhatsApp / Phone *',
+        'modal.email': 'Email Address',
+        'modal.industry': 'Business Industry',
+        'modal.terminals': 'Terminals Required',
+        'modal.notes': 'Notes / Special Requirements',
+      },
+      ar: {
+        'nav.screenshots': 'شاشات العرض والمحاكي',
+        'nav.customizer': 'مخصص الهوية والتصميم',
+        'nav.features': 'المزايا التقنية',
+        'nav.pricing': 'باقات الأسعار',
+        'nav.cta': 'طلب الترخيص',
+        'hero.badge': 'نظام الكاشير التجاري 2.0 • يدعم الاستضافات المشتركة بالكامل',
+        'hero.title': 'نظام الكاشير ونقاط البيع الشامل والمصمم لكل الأنشطة التجارية',
+        'hero.desc': 'يعمل مباشرة على أي استضافة مشتركة (hosting.com / cPanel / LiteSpeed باستخدام PHP 8.2+ و MySQL). قابل للتحويل إلى تطبيق Android و iOS فوري دون الحاجة لسيرفرات Node.js أو صلاحيات روت.',
+        'hero.try_demo': 'تجربة محاكي الكاشير المباشر',
+        'hero.white_label': 'تجربة تخصيص الهوية والشعار',
+        'metric.scan': 'سرعة قراءة الباركود',
+        'metric.post': 'بروتوكول POST بالكامل',
+        'metric.crypto': 'تشفير التراخيص الرقمي',
+        'metric.mobile': 'جاهز للموبايل عبر كاباسيتور',
+        'tour.tag': 'جولة مرئية وتفاعلية',
+        'tour.title': 'شاهد فيندرا قيد التشغيل الفعلي',
+        'tour.desc': 'تنقل بين 4 شاشات متخصصة لمختلف القطاعات لمعاينة الواجهات عالية الدقة وتجربة البيع الفوري.',
+        'cust.tag': 'بيئة تجربة تفاعلية',
+        'cust.title': 'خصص فيندرا بهوية متجرك وشعارك',
+        'cust.desc': 'جرب محرك التخصيص الكامل في متصفحك. غير اسم المتجر، لون الهوية، ونوع النشاط وشاهد الشاشة تتكيف فورياً!',
+        'cust.shop_name': 'اسم المتجر أو العلامة التجارية',
+        'cust.brand_color': 'لون الهوية الأساسي',
+        'cust.biz_mode': 'نوع النشاط التجاري',
+        'cust.currency': 'العملة الأساسية للحساب',
+        'cust.upload_logo': 'رفع شعار المتجر (معاينة)',
+        'feat.tag': 'هندسة فائقة للنجاح',
+        'feat.title': 'كل ميزة صُممت لتمنحك الأفضلية',
+        'feat.desc': 'قارن فيندرا بالأنظمة التقليدية القديمة. صمم ليوفر عليك التكاليف والصيانة مع أداء فوري موثوق.',
+        'price.tag': 'التراخيص التجارية',
+        'price.title': 'أسعار واضحة وباقات مرنة',
+        'price.desc': 'اختر بين الاشتراك الشهري الميسر أو شراء ترخيص دائم مدى الحياة لمتجرك.',
+        'modal.order_title': 'طلب ترخيص فيندرا / تجربة مجانية',
+        'modal.shop_name': 'اسم المتجر أو النشاط *',
+        'modal.contact_name': 'اسم المسؤول *',
+        'modal.phone': 'رقم الواتساب أو الهاتف *',
+        'modal.email': 'البريد الإلكتروني',
+        'modal.industry': 'نوع النشاط التجاري',
+        'modal.terminals': 'عدد نقاط البيع المطلوبة',
+        'modal.notes': 'ملاحظات أو متطلبات إضافية',
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'ar' : 'en';
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      document.getElementById('lang-label').innerText = currentLang === 'en' ? 'العربية' : 'English';
+
+      // Apply translations
+      const dict = translations[currentLang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.innerText = dict[key];
+      });
+      lucide.createIcons();
+    }
+
+    // 2. Interactive Screens Switcher
+    function switchScreenTab(tab) {
+      const tabs = ['supermarket', 'restaurant', 'retail', 'shifts'];
+      tabs.forEach(t => {
+        const content = document.getElementById('screen-content-' + t);
+        const btn = document.getElementById('tab-reset') || document.getElementById('tab-' + t);
+        if (content) content.classList.toggle('hidden', t !== tab);
+        if (btn) {
+          if (t === tab) {
+            btn.className = 'px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20 shrink-0';
+          } else {
+            btn.className = 'px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 hover:text-white shrink-0';
+          }
+        }
+      });
+    }
+
+    // 3. Audio & Barcode Gun Simulation
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 1850;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+      } catch (e) {}
+    }
+
+    function simulateBarcodeScan() {
+      playBeep();
+      const sampleItems = [
+        { name: 'Fresh Lebanese Bread (Carton)', plu: '20005', barcode: '528100299101', price: 1.20, qty: '1 pc' },
+        { name: 'Red Apples (Scale PLU #204)', plu: '00204', barcode: '2100204012003', price: 2.40, qty: '1.200 kg' },
+        { name: 'Turkish Roasted Coffee 500g', plu: '88901', barcode: '869019284102', price: 4.80, qty: '1 pc' },
+      ];
+      const randomItem = sampleItems[Math.floor(Math.random() * sampleItems.length)];
+      addSimItem(randomItem.name, randomItem.price, randomItem.barcode, randomItem.qty);
+    }
+
+    let simItems = [
+      { name: 'Organic Bananas (Scale PLU #101)', barcode: '2100101015007 (Prefix 21 Weight Embedded)', qty: '1.500 kg', price: 1.99, total: 2.99 },
+      { name: 'Whole Milk 1L', barcode: '890123456789 (Piece/Box Unit)', qty: '2 pcs', price: 3.49, total: 6.98 }
+    ];
+
+    function addSimItem(name, price, barcode = '89001928310', qty = '1 pc') {
+      simItems.push({ name, barcode, qty, price, total: price });
+      renderSimCart();
+    }
+
+    function clearSimCart() {
+      simItems = [];
+      renderSimCart();
+    }
+
+    function renderSimCart() {
+      const container = document.getElementById('sim-cart-items');
+      container.innerHTML = '';
+      let subtotal = 0;
+      simItems.forEach(item => {
+        subtotal += item.total;
+        const row = document.createElement('div');
+        row.className = 'px-4 py-2.5 grid grid-cols-6 items-center';
+        row.innerHTML = `
+          <div class="col-span-3">
+            <span class="font-bold text-white block">${item.name}</span>
+            <span class="text-[10px] text-emerald-400 font-mono">${item.barcode}</span>
+          </div>
+          <div class="text-center font-mono text-slate-300">${item.qty}</div>
+          <div class="text-right font-mono text-slate-400">$${item.price.toFixed(2)}</div>
+          <div class="text-right font-mono font-bold text-white">$${item.total.toFixed(2)}</div>
+        `;
+        container.appendChild(row);
+      });
+
+      const totalUsd = subtotal;
+      const totalLbp = Math.round(totalUsd * 89500);
+      document.getElementById('sim-total-usd').innerText = '$' + totalUsd.toFixed(2) + ' USD';
+      document.getElementById('sim-total-lbp').innerText = '≈ ' + totalLbp.toLocaleString() + ' LBP';
+    }
+
+    // 4. Restaurant Table Map Interactive Cycling
+    const tableStates = {
+      1: { name: 'T-01', state: 0, states: ['Available', 'Occupied ($28)', 'Bill Printed'], colors: ['border-emerald-500 bg-emerald-500/10 text-emerald-400', 'border-amber-500 bg-amber-500/10 text-amber-400', 'border-blue-500 bg-blue-500/10 text-blue-400'] },
+      2: { name: 'T-02', state: 1, states: ['Available', 'Occupied ($42)', 'Bill Printed'], colors: ['border-emerald-500 bg-emerald-500/10 text-emerald-400', 'border-amber-500 bg-amber-500/10 text-amber-400', 'border-blue-500 bg-blue-500/10 text-blue-400'] },
+      3: { name: 'T-03', state: 2, states: ['Available', 'Occupied ($55)', 'Bill Printed'], colors: ['border-emerald-500 bg-emerald-500/10 text-emerald-400', 'border-amber-500 bg-amber-500/10 text-amber-400', 'border-blue-500 bg-blue-500/10 text-blue-400'] },
+      4: { name: 'T-04', state: 0, states: ['Available', 'Occupied ($19)', 'Bill Printed'], colors: ['border-emerald-500 bg-emerald-500/10 text-emerald-400', 'border-amber-500 bg-amber-500/10 text-amber-400', 'border-blue-500 bg-blue-500/10 text-blue-400'] },
+    };
+
+    function cycleTable(id) {
+      if (!tableStates[id]) return;
+      playBeep();
+      const t = tableStates[id];
+      t.state = (t.state + 1) % 3;
+      const btn = document.getElementById('table-btn-' + id);
+      const label = document.getElementById('table-status-' + id);
+      btn.className = 'p-4 rounded-2xl border-2 text-center font-bold text-xs transition ' + t.colors[t.state];
+      label.innerText = t.states[t.state];
+    }
+
+    // 5. Live White-Label Customizer Playground
+    let customColor = '#10b981';
+    function pickColor(hex, name) {
+      customColor = hex;
+      document.getElementById('sim-logo-container').style.backgroundColor = hex;
+      document.getElementById('sim-pay-btn').style.backgroundColor = hex;
+      updateCustomizer();
+    }
+
+    function updateCustomizer() {
+      const name = document.getElementById('cust-shop-name').value || 'Vendra POS';
+      const mode = document.getElementById('cust-mode').value;
+      const currency = document.getElementById('cust-currency').value;
+
+      document.getElementById('sim-display-name').innerText = name;
+      document.getElementById('sim-receipt-brand').innerText = name;
+      document.getElementById('receipt-shop-title').innerText = name;
+      document.getElementById('sim-mode-tag').innerText = mode + ' Mode Active';
+      document.getElementById('sim-currency-tag').innerText = currency;
+    }
+
+    function handleCustLogo(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const logoUrl = event.target.result;
+        document.getElementById('sim-logo-container').innerHTML = `<img src="${logoUrl}" class="w-full h-full object-contain p-1 rounded-xl" />`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 6. Lead Capture Modal & WhatsApp Integration
+    let selectedTierName = 'Business Pro';
+    function openLeadModal(tierName, price) {
+      selectedTierName = tierName;
+      document.getElementById('modal-selected-tier').innerText = `${tierName} (${price})`;
+      document.getElementById('lead-modal').classList.remove('hidden');
+    }
+
+    function closeLeadModal() {
+      document.getElementById('lead-modal').classList.add('hidden');
+    }
+
+    async function submitLeadForm(e) {
+      e.preventDefault();
+      const btn = document.getElementById('lead-submit-btn');
+      const statusBox = document.getElementById('lead-status-box');
+      btn.disabled = true;
+      btn.innerText = 'Submitting Request...';
+
+      const payload = {
+        shop_name: document.getElementById('lead-shop').value,
+        contact_name: document.getElementById('lead-name').value,
+        phone: document.getElementById('lead-phone').value,
+        email: document.getElementById('lead-email').value,
+        industry: document.getElementById('lead-industry').value,
+        terminals: document.getElementById('lead-terminals').value,
+        notes: document.getElementById('lead-notes').value,
+        plan_tier: selectedTierName,
+      };
+
+      try {
+        const res = await fetch('/license-api/index.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'lead.create', payload })
+        });
+        const data = await res.json();
+
+        statusBox.classList.remove('hidden');
+        if (data.success) {
+          statusBox.className = 'p-3 rounded-xl text-xs bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold';
+          statusBox.innerText = '✓ ' + data.message;
+
+          // Pre-fill WhatsApp link
+          const waText = encodeURIComponent(`Hello! I would like to order Vendra POS for my store "${payload.shop_name}" (${payload.industry}, ${selectedTierName}). My name is ${payload.contact_name}.`);
+          document.getElementById('lead-whatsapp-btn').href = `https://wa.me/?text=${waText}`;
+
+          btn.innerText = 'Request Submitted!';
+        } else {
+          statusBox.className = 'p-3 rounded-xl text-xs bg-rose-500/10 border border-rose-500/30 text-rose-300';
+          statusBox.innerText = '✗ ' + data.message;
+          btn.disabled = false;
+          btn.innerText = 'Submit Request';
+        }
+      } catch (err) {
+        statusBox.classList.remove('hidden');
+        statusBox.className = 'p-3 rounded-xl text-xs bg-rose-500/10 border border-rose-500/30 text-rose-300';
+        statusBox.innerText = 'Network request error: ' + err.message;
+        btn.disabled = false;
+        btn.innerText = 'Submit Request';
+      }
+    }
+
+    // 7. Vendra Vault Admin Dashboard Modal
+    let adminAuthToken = null;
+    function openAdminModal() {
+      document.getElementById('admin-modal').classList.remove('hidden');
+    }
+    function closeAdminModal() {
+      document.getElementById('admin-modal').classList.add('hidden');
+    }
+
+    async function authenticateAdmin() {
+      const pass = document.getElementById('admin-pass-input').value;
+      const res = await fetch('/license-api/index.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'admin.login', payload: { password: pass } })
+      });
+      const data = await res.json();
+      if (data.success) {
+        adminAuthToken = data.data.token;
+        document.getElementById('admin-login-view').classList.add('hidden');
+        document.getElementById('admin-workspace-view').classList.remove('hidden');
+        fetchAdminLicenses();
+      } else {
+        alert(data.message || 'Invalid credentials');
+      }
+    }
+
+    function switchAdminSubtab(tab) {
+      ['licenses', 'generator', 'leads', 'heartbeats'].forEach(t => {
+        document.getElementById('admin-section-' + t).classList.toggle('hidden', t !== tab);
+      });
+      if (tab === 'leads') fetchAdminLeads();
+      if (tab === 'heartbeats') fetchAdminHeartbeats();
+    }
+
+    async function fetchAdminLicenses() {
+      const res = await fetch('/license-api/index.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'license.list', auth_token: adminAuthToken })
+      });
+      const data = await res.json();
+      const list = document.getElementById('admin-licenses-list');
+      if (data.success && data.data?.licenses?.length > 0) {
+        list.innerHTML = '';
+        data.data.licenses.forEach(l => {
+          const item = document.createElement('div');
+          item.className = 'p-3 flex items-center justify-between text-xs';
+          item.innerHTML = `
+            <div>
+              <span class="font-bold text-white block">${l.customer_name} (${l.license_id})</span>
+              <span class="text-[10px] text-slate-400 font-mono">${l.plan_tier} &bull; ${l.max_terminals} Terminals &bull; ${l.days_remaining} Days Remaining</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.status === 'ACTIVE' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${l.status}</span>
+              <button onclick="revokeLicense('${l.license_id}')" class="px-2 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 rounded text-[10px] font-bold">Revoke</button>
+              <button onclick="extendLicense('${l.license_id}')" class="px-2 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 rounded text-[10px] font-bold">+30 Days</button>
+            </div>
+          `;
+          list.appendChild(item);
+        });
+      } else {
+        list.innerHTML = '<div class="p-4 text-center text-slate-500">No licenses found. Use "Issue New License" to generate one.</div>';
+      }
+    }
+
+    async function revokeLicense(id) {
+      if (!confirm('Are you sure you want to remotely revoke license ' + id + '? The client POS will lock.')) return;
+      await fetch('/license-api/index.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'license.revoke', auth_token: adminAuthToken, payload: { license_id: id } })
+      });
+      fetchAdminLicenses();
+    }
+
+    async function extendLicense(id) {
+      await fetch('/license-api/index.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'license.extend', auth_token: adminAuthToken, payload: { license_id: id, days: 30 } })
+      });
+      fetchAdminLicenses();
+    }
+
+    async function generateClientLicense() {
+      const payload = {
+        customer_name: document.getElementById('gen-cname').value,
+        allowed_domains: document.getElementById('gen-domains').value,
+        plan_tier: document.getElementById('gen-tier').value,
+        days_valid: document.getElementById('gen-days').value,
+      };
+      const res = await fetch('/license-api/index.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'license.generate', auth_token: adminAuthToken, payload })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const box = document.getElementById('gen-output');
+        box.classList.remove('hidden');
+        box.innerText = JSON.stringify(data.data.license_package, null, 2);
+
+        // Instant Download of license.key
+        const blob = new Blob([JSON.stringify(data.data.license_package, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `license-${data.data.license_id}.key`;
+        a.click();
+      }
+    }
+
+    async function fetchAdminLeads() {
+      const res = await fetch('/license-api/index.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'leads.list', auth_token: adminAuthToken })
+      });
+      const data = await res.json();
+      const list = document.getElementById('admin-leads-list');
+      if (data.success && data.data?.leads?.length > 0) {
+        list.innerHTML = '';
+        data.data.leads.forEach(ld => {
+          const item = document.createElement('div');
+          item.className = 'p-3 flex items-center justify-between text-xs';
+          item.innerHTML = `
+            <div>
+              <span class="font-bold text-white block">${ld.shop_name} (${ld.contact_name})</span>
+              <span class="text-[10px] text-slate-400">${ld.industry} &bull; ${ld.plan_tier} &bull; ${ld.phone} &bull; ${ld.email || 'No email'}</span>
+            </div>
+            <a href="https://wa.me/${ld.phone.replace(/[^0-9]/g, '')}" target="_blank" class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-lg font-bold text-[10px]">
+              WhatsApp
+            </a>
+          `;
+          list.appendChild(item);
+        });
+      } else {
+        list.innerHTML = '<div class="p-4 text-center text-slate-500">No leads submitted yet.</div>';
+      }
+    }
+
+    async function fetchAdminHeartbeats() {
+      const res = await fetch('/license-api/index.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'heartbeats.list', auth_token: adminAuthToken })
+      });
+      const data = await res.json();
+      const list = document.getElementById('admin-heartbeats-list');
+      if (data.success && data.data?.heartbeats?.length > 0) {
+        list.innerHTML = '';
+        data.data.heartbeats.forEach(hb => {
+          const item = document.createElement('div');
+          item.className = 'p-3 flex items-center justify-between';
+          item.innerHTML = `
+            <div>
+              <span class="font-bold text-emerald-400">${hb.license_id}</span>
+              <span class="text-slate-400 ml-2">${hb.domain} (${hb.client_ip})</span>
+            </div>
+            <span class="text-slate-500 text-[10px]">${hb.created_at}</span>
+          `;
+          list.appendChild(item);
+        });
+      } else {
+        list.innerHTML = '<div class="p-4 text-center text-slate-500 font-sans text-xs">No client heartbeats recorded yet.</div>';
+      }
+    }
+  </script>
+</body>
+</html>
