@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #10b981;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* RTL Layout Helpers */
+[dir="rtl"] {
+  font-family: 'Cairo', system-ui, sans-serif;
+}
+
+/* Dedicated CSS Print Styles for ESC/POS Thermal Receipts */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #receipt-print-area, #receipt-print-area * {
+    visibility: visible;
+  }
+  #receipt-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 2mm !important;
+    color: black !important;
+    background: white !important;
+  }
+  @page {
+    margin: 0;
+    size: auto;
+  }
+}

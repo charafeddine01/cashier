@@ -1,0 +1,52 @@
+# OmniPOS Pro - Production Apache / LiteSpeed / cPanel .htaccess
+# 100% POST API Routing & React SPA Static Serving
+
+Options -Indexes
+Options +FollowSymLinks
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Security: Protect sensitive backend directories and database files
+    RewriteRule ^database/ - [F,L]
+    RewriteRule ^api/config/ - [F,L]
+    RewriteRule ^api/config\.php$ - [F,L]
+    RewriteRule \.(sql|sqlite|sqlite3|db|env|log|key)$ - [F,L]
+
+    # Route all API calls directly to /api/index.php
+    RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+
+    # Vendor License Manager is allowed direct access
+    RewriteRule ^vendor-license-manager/(.*)$ vendor-license-manager/$1 [L]
+
+    # Web Installer is allowed direct access
+    RewriteRule ^install/(.*)$ install/$1 [L]
+    RewriteRule ^install$ install/ [R=301,L]
+
+    # Serve static assets from dist/ if they exist
+    RewriteCond %{DOCUMENT_ROOT}/dist/$1 -f
+    RewriteRule ^(.*)$ dist/$1 [L]
+
+    # If file exists in root (e.g. manifest.json, sw.js, uploads/)
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # SPA Fallback: Route all frontend views to dist/index.html
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^.*$ dist/index.html [L]
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Gzip Compression for Fast POS Loading
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE application/javascript application/json text/css text/html text/plain text/xml
+</IfModule>

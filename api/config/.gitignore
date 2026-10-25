@@ -1,0 +1,4 @@
+# Ignore generated local environment credentials and lock files
+env.php
+installed.lock
+!.htaccess

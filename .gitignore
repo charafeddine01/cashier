@@ -1,0 +1,11 @@
+node_modules/
+.DS_Store
+*.sqlite
+database/*.sqlite
+api/config/env.php
+api/config/installed.lock
+*.zip
+public/uploads/*
+!public/uploads/.gitkeep
+dist/uploads/*
+!dist/uploads/.gitkeep
