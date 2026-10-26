@@ -1,4 +1,5 @@
 import React from 'react';
+import { CompanySettings } from '../../types';
 import { I18nService } from '../../services/i18nService';
 import {
   LayoutGrid,
@@ -33,16 +34,19 @@ export type ActiveTab =
 
 interface Props {
   activeTab: ActiveTab;
+  settings?: CompanySettings | null;
   onSelectTab: (tab: ActiveTab) => void;
   onLogout: () => void;
   isCollapsed?: boolean;
 }
 
-export const Sidebar: React.FC<Props> = ({ activeTab, onSelectTab, onLogout, isCollapsed = false }) => {
-  const menuItems: Array<{ id: ActiveTab; label: string; icon: React.FC<{ className?: string }>; badge?: string }> = [
+export const Sidebar: React.FC<Props> = ({ activeTab, settings, onSelectTab, onLogout, isCollapsed = false }) => {
+  const isRestaurant = settings?.business_mode === 'RESTAURANT';
+
+  const allMenuItems: Array<{ id: ActiveTab; label: string; icon: React.FC<{ className?: string }>; restaurantOnly?: boolean }> = [
     { id: 'pos', label: I18nService.t('nav.pos'), icon: LayoutGrid },
-    { id: 'restaurant', label: I18nService.t('nav.restaurant'), icon: Utensils },
-    { id: 'kds', label: I18nService.t('nav.kds'), icon: ChefHat },
+    { id: 'restaurant', label: I18nService.t('nav.restaurant'), icon: Utensils, restaurantOnly: true },
+    { id: 'kds', label: I18nService.t('nav.kds'), icon: ChefHat, restaurantOnly: true },
     { id: 'products', label: I18nService.t('nav.products'), icon: Package },
     { id: 'inventory', label: I18nService.t('nav.inventory'), icon: Boxes },
     { id: 'returns', label: I18nService.t('nav.returns'), icon: RotateCcw },
@@ -53,6 +57,8 @@ export const Sidebar: React.FC<Props> = ({ activeTab, onSelectTab, onLogout, isC
     { id: 'customer_display', label: I18nService.t('nav.customer_display'), icon: Tv },
     { id: 'license', label: I18nService.t('lic.title'), icon: ShieldCheck },
   ];
+
+  const menuItems = allMenuItems.filter((item) => !item.restaurantOnly || isRestaurant);
 
   return (
     <aside

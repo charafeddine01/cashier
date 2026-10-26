@@ -12,3 +12,13 @@ public/uploads/*
 !public/uploads/.gitkeep
 dist/uploads/*
 !dist/uploads/.gitkeep
+dist-windows/downloads/
+dist-windows/*.zip
+dist-windows/VendraPOS/php/*.dll
+dist-windows/VendraPOS/php/*.exe
+dist-windows/VendraPOS/php/dev/
+dist-windows/VendraPOS/php/ext/
+dist-windows/VendraPOS/php/lib/
+dist-windows/VendraPOS/php/extras/
+dist-windows/VendraPOS/logs/
+dist-windows/VendraPOS/app/

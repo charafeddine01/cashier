@@ -6,7 +6,3 @@ Options -Indexes
     RewriteCond %{REQUEST_FILENAME} !index\.php$
     RewriteRule ^.*$ index.php [QSA,L]
 </IfModule>
-
-<LimitExcept POST OPTIONS>
-    Require all denied
-</LimitExcept>

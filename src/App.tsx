@@ -215,6 +215,7 @@ export const App: React.FC = () => {
         {/* Navigation Sidebar */}
         <Sidebar
           activeTab={activeTab}
+          settings={settings}
           onSelectTab={(tab) => {
             if (tab === 'returns') {
               setIsReturnsModalOpen(true);
