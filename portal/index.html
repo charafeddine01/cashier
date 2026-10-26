@@ -84,6 +84,18 @@
 
       <!-- Action Buttons & Language Switcher -->
       <div class="flex items-center gap-3">
+        <!-- WhatsApp Direct Contact Pill -->
+        <a
+          href="https://wa.me/96170024524"
+          target="_blank"
+          rel="noreferrer"
+          class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-xs font-bold text-emerald-400 transition"
+          title="Direct WhatsApp Support"
+        >
+          <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+          <span>+961 70 024 524</span>
+        </a>
+
         <!-- Language Switcher -->
         <button
           onclick="toggleLanguage()"
@@ -820,15 +832,37 @@
   <!-- ==========================================
        FOOTER
        ========================================== -->
-  <footer class="border-t border-slate-800/80 bg-slate-950 py-12 text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-indigo-600 flex items-center justify-center font-black text-white text-sm">V</div>
-        <span class="font-bold text-slate-300">Vendra POS &bull; vendra.charafeddine.xyz</span>
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-12 text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-850">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-indigo-600 flex items-center justify-center font-black text-white text-base shadow-lg shadow-emerald-500/20">V</div>
+          <div>
+            <span class="font-extrabold text-white text-sm block">Vendra POS</span>
+            <span class="text-[11px] text-slate-400">Commercial Cashier System &bull; vendra.charafeddine.xyz</span>
+          </div>
+        </div>
+
+        <!-- Contact Badges -->
+        <div class="flex flex-wrap items-center justify-center gap-3 text-xs">
+          <a href="https://wa.me/96170024524" target="_blank" rel="noreferrer" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 font-bold transition">
+            <i data-lucide="message-circle" class="w-4 h-4"></i>
+            <span>WhatsApp: +961 70 024 524</span>
+          </a>
+          <a href="tel:+96170024524" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-300 font-bold transition">
+            <i data-lucide="phone" class="w-4 h-4 text-emerald-400"></i>
+            <span>+961 70 024 524</span>
+          </a>
+          <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 font-bold">
+            <i data-lucide="map-pin" class="w-4 h-4 text-emerald-400"></i>
+            <span data-i18n="footer.location">Baalbeck - Lebanon</span>
+          </div>
+        </div>
       </div>
-      <div class="text-center sm:text-right">
-        <p>Commercial Cashier System & Central License Authority &bull; Hosted on hosting.com</p>
-        <p class="text-[10px] text-slate-600 mt-1">100% POST Protocol &bull; Ed25519 Asymmetric Verification &bull; InnoDB DECIMAL(15,4)</p>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-4">
+        <p>&copy; 2026 Vendra POS &bull; All Rights Reserved &bull; Baalbeck, Lebanon</p>
+        <p class="text-slate-500 font-mono">100% POST Protocol &bull; Ed25519 Cryptographic Licensing &bull; Shared-Hosting Native</p>
       </div>
     </div>
   </footer>
@@ -863,7 +897,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block font-bold text-slate-300 mb-1" data-i18n="modal.phone">WhatsApp / Phone *</label>
-            <input type="tel" id="lead-phone" required placeholder="+961 70 000 000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+            <input type="tel" id="lead-phone" required placeholder="+961 70 024 524" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
           </div>
           <div>
             <label class="block font-bold text-slate-300 mb-1" data-i18n="modal.email">Email Address</label>
@@ -900,7 +934,7 @@
           </button>
           <a
             id="lead-whatsapp-btn"
-            href="https://wa.me/?text=Hello!%20I%20would%20like%20to%20order%20Vendra%20POS."
+            href="https://wa.me/96170024524?text=Hello!%20I%20would%20like%20to%20order%20Vendra%20POS."
             target="_blank"
             rel="noreferrer"
             class="w-full py-3 rounded-2xl bg-emerald-600/10 hover:bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 font-bold text-xs transition flex items-center justify-center gap-2"
@@ -1069,6 +1103,7 @@
         'modal.industry': 'Business Industry',
         'modal.terminals': 'Terminals Required',
         'modal.notes': 'Notes / Special Requirements',
+        'footer.location': 'Baalbeck - Lebanon',
       },
       ar: {
         'nav.screenshots': 'شاشات العرض والمحاكي',
@@ -1110,6 +1145,7 @@
         'modal.industry': 'نوع النشاط التجاري',
         'modal.terminals': 'عدد نقاط البيع المطلوبة',
         'modal.notes': 'ملاحظات أو متطلبات إضافية',
+        'footer.location': 'بعلبك - لبنان',
       }
     };
 
@@ -1310,7 +1346,7 @@
 
           // Pre-fill WhatsApp link
           const waText = encodeURIComponent(`Hello! I would like to order Vendra POS for my store "${payload.shop_name}" (${payload.industry}, ${selectedTierName}). My name is ${payload.contact_name}.`);
-          document.getElementById('lead-whatsapp-btn').href = `https://wa.me/?text=${waText}`;
+          document.getElementById('lead-whatsapp-btn').href = `https://wa.me/96170024524?text=${waText}`;
 
           btn.innerText = 'Request Submitted!';
         } else {

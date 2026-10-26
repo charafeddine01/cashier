@@ -83,9 +83,28 @@ function getDB(array $config): PDO {
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);
+        try {
+            $check = $pdo->query("SHOW TABLES LIKE 'portal_licenses'")->fetchColumn();
+            if (!$check) {
+                initPortalMysqlDatabase($pdo);
+            }
+        } catch (\Throwable $e) {}
     }
 
     return $pdo;
+}
+
+function initPortalMysqlDatabase(PDO $pdo): void {
+    $schemaFile = __DIR__ . '/../database/vendra_portal_schema.sql';
+    if (!file_exists($schemaFile)) return;
+
+    $sql = file_get_contents($schemaFile);
+    $statements = array_filter(array_map('trim', explode(';', $sql)));
+    foreach ($statements as $stmt) {
+        if (!empty($stmt)) {
+            try { $pdo->exec($stmt); } catch (\Throwable $t) {}
+        }
+    }
 }
 
 function initPortalSqliteDatabase(PDO $pdo): void {
