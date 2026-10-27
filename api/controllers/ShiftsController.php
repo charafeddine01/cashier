@@ -6,6 +6,7 @@ namespace OmniPOS\Controllers;
 use OmniPOS\Core\Auth;
 use OmniPOS\Core\Database;
 use OmniPOS\Core\Response;
+use OmniPOS\Core\BackupService;
 
 class ShiftsController
 {
@@ -232,6 +233,9 @@ class ShiftsController
             ':denoms' => $denominations,
             ':sid' => $shiftId,
         ]);
+
+        // Trigger automatic database backup & cloud sync on shift close
+        BackupService::triggerShiftClose();
 
         Response::success([
             'report_type' => 'Z-REPORT (END OF SHIFT CLOSING)',

@@ -341,3 +341,133 @@ export interface ApiResponse<T = any> {
   code: number;
   timestamp: number;
 }
+
+export interface InstallmentPlan {
+  id: number;
+  order_id: number;
+  customer_id: number;
+  plan_number: string;
+  total_amount: number;
+  down_payment: number;
+  remaining_balance: number;
+  total_installments: number;
+  installment_amount: number;
+  frequency: 'MONTHLY' | 'WEEKLY';
+  status: 'ACTIVE' | 'COMPLETED' | 'DEFAULTED' | 'CANCELLED';
+  notes?: string;
+  created_at: string;
+  updated_at?: string;
+  customer_name?: string;
+  customer_phone?: string;
+  invoice_number?: string;
+  order_date?: string;
+  paid_installments_count?: number;
+  next_due_date?: string;
+  next_due_amount?: number;
+}
+
+export interface InstallmentScheduleItem {
+  id: number;
+  plan_id: number;
+  installment_number: number;
+  due_date: string;
+  amount_due: number;
+  amount_paid: number;
+  remaining_amount: number;
+  status: 'PENDING' | 'PARTIAL' | 'PAID' | 'OVERDUE';
+  notes?: string;
+  paid_at?: string;
+  created_at: string;
+}
+
+export interface InstallmentPaymentRecord {
+  id: number;
+  schedule_id: number;
+  plan_id: number;
+  customer_id: number;
+  receipt_number: string;
+  amount_paid: number;
+  currency: string;
+  exchange_rate: number;
+  payment_method: string;
+  cashier_id: number;
+  cashier_name?: string;
+  notes?: string;
+  payment_date: string;
+}
+
+export type SyncMode = 'SYNC' | 'BACKUP' | 'DUAL';
+export type BackupFrequency =
+  | 'MANUAL'
+  | 'ON_SHIFT_CLOSE'
+  | 'EVERY_15_MIN'
+  | 'EVERY_30_MIN'
+  | 'HOURLY'
+  | 'EVERY_6_HOURS'
+  | 'DAILY';
+
+export interface BackupSettings {
+  id: number;
+  sync_mode: SyncMode;
+  frequency: BackupFrequency;
+  daily_time: string;
+  keep_snapshots_count: number;
+  compress_backups: number;
+
+  // External USB Storage
+  usb_enabled: number;
+  usb_path: string;
+  last_usb_sync_at?: string | null;
+  last_usb_sync_status?: 'SUCCESS' | 'FAILED' | 'PENDING' | null;
+  last_usb_sync_message?: string | null;
+  last_usb_sync_size?: number;
+
+  // Google Drive Cloud
+  gdrive_enabled: number;
+  gdrive_auth_type: 'SERVICE_ACCOUNT' | 'OAUTH_TOKEN' | 'LOCAL_FOLDER';
+  gdrive_folder_id?: string;
+  gdrive_folder_name: string;
+  gdrive_client_email?: string;
+  gdrive_private_key?: string;
+  has_gdrive_private_key?: boolean;
+  gdrive_refresh_token?: string;
+  has_gdrive_refresh_token?: boolean;
+  gdrive_client_id?: string;
+  gdrive_client_secret?: string;
+  has_gdrive_client_secret?: boolean;
+  gdrive_synced_file_id?: string;
+  gdrive_local_path?: string;
+  last_gdrive_sync_at?: string | null;
+  last_gdrive_sync_status?: 'SUCCESS' | 'FAILED' | 'PENDING' | null;
+  last_gdrive_sync_message?: string | null;
+  last_gdrive_sync_size?: number;
+
+  last_sync_at?: string | null;
+  last_sync_hash?: string | null;
+  updated_at?: string;
+}
+
+export interface BackupLog {
+  id: number;
+  trigger_type: 'MANUAL' | 'SCHEDULED' | 'SHIFT_CLOSE' | 'CLI';
+  action_type: 'SYNC' | 'BACKUP';
+  destination: 'USB' | 'GDRIVE' | 'ALL';
+  status: 'SUCCESS' | 'FAILED' | 'PARTIAL';
+  file_name?: string;
+  file_size_bytes: number;
+  file_size_human?: string;
+  duration_ms: number;
+  details?: string;
+  details_parsed?: any;
+  created_at: string;
+}
+
+export interface UsbDriveInfo {
+  path: string;
+  name: string;
+  free_bytes: number;
+  total_bytes: number;
+  free_human: string;
+  is_writable: boolean;
+  suggested_backup_dir: string;
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CompanySettings, User, Shift } from '../../types';
 import { I18nService, LanguageCode } from '../../services/i18nService';
 import { OfflineSyncService } from '../../services/offlineSyncService';
+import { BackupSyncService } from '../../services/backupSyncService';
 import {
   Store,
   UtensilsCrossed,
@@ -14,7 +15,8 @@ import {
   Clock,
   Globe,
   Sliders,
-  DollarSign
+  DollarSign,
+  HardDrive
 } from 'lucide-react';
 
 interface Props {
@@ -24,6 +26,7 @@ interface Props {
   onOpenSwitchModal: () => void;
   onOpenShiftModal: () => void;
   onModeChange: (mode: 'SUPERMARKET' | 'RESTAURANT' | 'RETAIL' | 'PHARMACY') => void;
+  onOpenBackupSync?: () => void;
 }
 
 export const TopBar: React.FC<Props> = ({
@@ -33,9 +36,11 @@ export const TopBar: React.FC<Props> = ({
   onOpenSwitchModal,
   onOpenShiftModal,
   onModeChange,
+  onOpenBackupSync,
 }) => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [pendingSyncCount, setPendingSyncCount] = useState(0);
+  const [backupStatus, setBackupStatus] = useState<'IDLE' | 'SYNCING' | 'SUCCESS' | 'ERROR'>('IDLE');
   const [timeStr, setTimeStr] = useState('');
   const [lang, setLang] = useState<LanguageCode>(I18nService.getLanguage());
 
@@ -50,6 +55,10 @@ export const TopBar: React.FC<Props> = ({
       setPendingSyncCount(status.pendingCount);
     });
 
+    const unsubscribeBackup = BackupSyncService.onSyncUpdate((evt) => {
+      setBackupStatus(evt.status);
+    });
+
     const timer = setInterval(() => {
       const now = new Date();
       setTimeStr(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
@@ -59,6 +68,7 @@ export const TopBar: React.FC<Props> = ({
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       unsubscribeSync();
+      unsubscribeBackup();
       clearInterval(timer);
     };
   }, []);
@@ -102,7 +112,7 @@ export const TopBar: React.FC<Props> = ({
 
         <div>
           <h1 className="font-bold text-sm tracking-tight leading-none text-white flex items-center gap-2">
-            <span>{lang === 'ar' && settings?.company_name_ar ? settings.company_name_ar : (settings?.company_name || 'Vendra POS')}</span>
+            <span>{lang === 'ar' && settings?.company_name_ar ? settings.company_name_ar : (settings?.company_name || 'OmniPOS Pro')}</span>
           </h1>
           <span className="text-[10px] text-slate-400 font-mono tracking-wide">
             {settings?.tax_id ? `TAX: ${settings.tax_id}` : 'Universal Cashier System'}
@@ -147,6 +157,24 @@ export const TopBar: React.FC<Props> = ({
             </span>
           )}
         </div>
+
+        {/* Database Backup & Cloud Sync Status Pill */}
+        <button
+          type="button"
+          onClick={onOpenBackupSync}
+          title="Database Sync Engine (USB + Google Drive). Click to configure."
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition ${
+            backupStatus === 'SYNCING'
+              ? 'bg-blue-600/20 border-blue-500/40 text-blue-300 animate-pulse'
+              : backupStatus === 'ERROR'
+              ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+              : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/20'
+          }`}
+        >
+          <HardDrive className="w-3.5 h-3.5 text-indigo-400" />
+          <span className="hidden lg:inline">DB Sync</span>
+          {backupStatus === 'SYNCING' && <RefreshCw className="w-3 h-3 animate-spin text-blue-400" />}
+        </button>
 
         {/* Active Shift Indicator */}
         <button

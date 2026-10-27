@@ -525,4 +525,59 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
     INDEX `idx_audit_mod` (`module`, `action`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 27. Database Backup & Cloud Sync Configuration
+CREATE TABLE IF NOT EXISTS `backup_settings` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `sync_mode` ENUM('SYNC', 'BACKUP', 'DUAL') NOT NULL DEFAULT 'SYNC' COMMENT 'SYNC: 1 live mirror replica; BACKUP: timestamped archives; DUAL: mirror + daily archive',
+    `frequency` ENUM('MANUAL', 'ON_SHIFT_CLOSE', 'EVERY_15_MIN', 'EVERY_30_MIN', 'HOURLY', 'EVERY_6_HOURS', 'DAILY') NOT NULL DEFAULT 'ON_SHIFT_CLOSE',
+    `daily_time` VARCHAR(8) NOT NULL DEFAULT '23:00',
+    `keep_snapshots_count` INT UNSIGNED NOT NULL DEFAULT 7,
+    `compress_backups` TINYINT(1) NOT NULL DEFAULT 1,
+    
+    -- Destination 1: Local External USB / Removable Storage
+    `usb_enabled` TINYINT(1) NOT NULL DEFAULT 1,
+    `usb_path` VARCHAR(255) NOT NULL DEFAULT '/media/usb/omnipos_backups',
+    `last_usb_sync_at` DATETIME NULL,
+    `last_usb_sync_status` VARCHAR(32) NULL DEFAULT 'PENDING',
+    `last_usb_sync_message` TEXT NULL,
+    `last_usb_sync_size` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+
+    -- Destination 2: Google Drive Cloud Sync
+    `gdrive_enabled` TINYINT(1) NOT NULL DEFAULT 0,
+    `gdrive_auth_type` ENUM('SERVICE_ACCOUNT', 'OAUTH_TOKEN', 'LOCAL_FOLDER') NOT NULL DEFAULT 'SERVICE_ACCOUNT',
+    `gdrive_folder_id` VARCHAR(128) NULL DEFAULT '',
+    `gdrive_folder_name` VARCHAR(128) NOT NULL DEFAULT 'OmniPOS_Cloud_Sync',
+    `gdrive_client_email` VARCHAR(255) NULL,
+    `gdrive_private_key` TEXT NULL,
+    `gdrive_refresh_token` TEXT NULL,
+    `gdrive_client_id` VARCHAR(255) NULL,
+    `gdrive_client_secret` VARCHAR(255) NULL,
+    `gdrive_access_token` TEXT NULL,
+    `gdrive_token_expires_at` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    `gdrive_synced_file_id` VARCHAR(128) NULL,
+    `gdrive_local_path` VARCHAR(255) NULL,
+    `last_gdrive_sync_at` DATETIME NULL,
+    `last_gdrive_sync_status` VARCHAR(32) NULL DEFAULT 'PENDING',
+    `last_gdrive_sync_message` TEXT NULL,
+    `last_gdrive_sync_size` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+
+    `last_sync_at` DATETIME NULL,
+    `last_sync_hash` VARCHAR(64) NULL,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 28. Database Backup & Sync Activity History
+CREATE TABLE IF NOT EXISTS `backup_logs` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `trigger_type` ENUM('MANUAL', 'SCHEDULED', 'SHIFT_CLOSE', 'CLI') NOT NULL DEFAULT 'MANUAL',
+    `action_type` ENUM('SYNC', 'BACKUP') NOT NULL DEFAULT 'SYNC',
+    `destination` ENUM('USB', 'GDRIVE', 'ALL') NOT NULL DEFAULT 'ALL',
+    `status` ENUM('SUCCESS', 'FAILED', 'PARTIAL') NOT NULL DEFAULT 'SUCCESS',
+    `file_name` VARCHAR(255) NULL,
+    `file_size_bytes` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    `duration_ms` INT UNSIGNED NOT NULL DEFAULT 0,
+    `details` TEXT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;

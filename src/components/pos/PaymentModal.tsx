@@ -7,6 +7,7 @@ import {
   Banknote,
   Split,
   FileText,
+  Calendar,
   Printer,
   CheckCircle2,
   DollarSign,
@@ -28,6 +29,14 @@ interface Props {
     changeGiven: number;
     changeCurrency: 'PRIMARY' | 'SECONDARY';
     exchangeRate: number;
+    installmentPlan?: {
+      total_amount: number;
+      down_payment: number;
+      total_installments: number;
+      frequency: 'MONTHLY' | 'WEEKLY';
+      first_due_date: string;
+      notes?: string;
+    };
   }) => Promise<void>;
 }
 
@@ -43,8 +52,8 @@ export const PaymentModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   const primarySymbol = settings?.primary_currency_symbol || '$';
-  const secondarySymbol = settings?.secondary_currency_symbol || '€';
-  const secondaryRate = settings?.secondary_currency_rate || 0.92;
+  const secondarySymbol = settings?.secondary_currency_symbol || 'L.L.';
+  const secondaryRate = settings?.secondary_currency_rate || 89500;
 
   const subtotal = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
   const discountTotal = items.reduce((sum, item) => sum + (item.discount_amount || 0), 0);
@@ -52,11 +61,19 @@ export const PaymentModal: React.FC<Props> = ({
   const grandTotal = Math.max(0, subtotal + taxTotal - discountTotal);
   const grandTotalSecondary = grandTotal * secondaryRate;
 
-  const [paymentType, setPaymentType] = useState<'CASH' | 'CARD' | 'SPLIT' | 'ON_ACCOUNT'>('CASH');
+  const [paymentType, setPaymentType] = useState<'CASH' | 'CARD' | 'SPLIT' | 'ON_ACCOUNT' | 'INSTALLMENT'>('CASH');
   const [tenderedCash, setTenderedCash] = useState<number>(grandTotal);
   const [tenderedCard, setTenderedCard] = useState<number>(0);
   const [tenderedOnAccount, setTenderedOnAccount] = useState<number>(0);
   const [changeCurrency, setChangeCurrency] = useState<'PRIMARY' | 'SECONDARY'>('PRIMARY');
+
+  // Installment specific states
+  const [downPayment, setDownPayment] = useState<number>(Math.round(grandTotal * 0.3));
+  const [installmentCount, setInstallmentCount] = useState<number>(4);
+  const defaultDueDate = new Date();
+  defaultDueDate.setDate(defaultDueDate.getDate() + 30);
+  const [firstDueDate, setFirstDueDate] = useState<string>(defaultDueDate.toISOString().split('T')[0]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -65,10 +82,14 @@ export const PaymentModal: React.FC<Props> = ({
     setTenderedCash(amount);
   };
 
+  const financedRemaining = Math.max(0, grandTotal - downPayment);
+  const monthlyInstallment = installmentCount > 0 ? (financedRemaining / installmentCount) : 0;
+
   // Change computation
   const totalPaid = (paymentType === 'CASH' ? tenderedCash : 0) +
                     (paymentType === 'CARD' ? grandTotal : (paymentType === 'SPLIT' ? tenderedCash + tenderedCard : 0)) +
-                    (paymentType === 'ON_ACCOUNT' ? grandTotal : 0);
+                    (paymentType === 'ON_ACCOUNT' ? grandTotal : 0) +
+                    (paymentType === 'INSTALLMENT' ? downPayment : 0);
 
   const changeDuePrimary = Math.max(0, (paymentType === 'CASH' ? tenderedCash - grandTotal : (paymentType === 'SPLIT' ? (tenderedCash + tenderedCard) - grandTotal : 0)));
   const changeDueSecondary = changeDuePrimary * secondaryRate;
@@ -89,6 +110,22 @@ export const PaymentModal: React.FC<Props> = ({
       }
     }
 
+    // Validate installment plan
+    if (paymentType === 'INSTALLMENT') {
+      if (!customer || customer.id === 1) {
+        setErrorMsg('Please select a registered customer to create an installment plan (الأقساط).');
+        return;
+      }
+      if (downPayment >= grandTotal) {
+        setErrorMsg('Down payment equals or exceeds total amount. Please use standard Cash/Card payment.');
+        return;
+      }
+      if (installmentCount < 1) {
+        setErrorMsg('Number of installments must be at least 1.');
+        return;
+      }
+    }
+
     if (paymentType === 'CASH' && tenderedCash < grandTotal) {
       setErrorMsg('Tendered cash is less than grand total.');
       return;
@@ -103,13 +140,21 @@ export const PaymentModal: React.FC<Props> = ({
 
     try {
       await onConfirmOrder({
-        paidCash: paymentType === 'CASH' ? tenderedCash : (paymentType === 'SPLIT' ? tenderedCash : 0),
+        paidCash: paymentType === 'CASH' ? tenderedCash : (paymentType === 'SPLIT' ? tenderedCash : (paymentType === 'INSTALLMENT' ? downPayment : 0)),
         paidCard: paymentType === 'CARD' ? grandTotal : (paymentType === 'SPLIT' ? tenderedCard : 0),
         paidCredit: 0,
-        paidOnAccount: paymentType === 'ON_ACCOUNT' ? grandTotal : 0,
+        paidOnAccount: paymentType === 'ON_ACCOUNT' ? grandTotal : (paymentType === 'INSTALLMENT' ? financedRemaining : 0),
         changeGiven: changeCurrency === 'PRIMARY' ? changeDuePrimary : changeDueSecondary,
         changeCurrency,
         exchangeRate: secondaryRate,
+        installmentPlan: paymentType === 'INSTALLMENT' ? {
+          total_amount: grandTotal,
+          down_payment: downPayment,
+          total_installments: installmentCount,
+          frequency: 'MONTHLY',
+          first_due_date: firstDueDate,
+          notes: `Solar Showroom Installment Plan (${installmentCount} months @ $${monthlyInstallment.toFixed(2)}/mo)`,
+        } : undefined,
       });
       setIsSubmitting(false);
       onClose();
@@ -155,10 +200,10 @@ export const PaymentModal: React.FC<Props> = ({
         )}
 
         {/* Tender Method Selector */}
-        <div className="grid grid-cols-4 gap-2 mb-5">
+        <div className="grid grid-cols-5 gap-2 mb-5">
           <button
             onClick={() => { setPaymentType('CASH'); setTenderedCash(grandTotal); }}
-            className={`py-3 px-2 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
+            className={`py-3 px-1.5 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
               paymentType === 'CASH'
                 ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/30'
                 : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
@@ -170,7 +215,7 @@ export const PaymentModal: React.FC<Props> = ({
 
           <button
             onClick={() => { setPaymentType('CARD'); }}
-            className={`py-3 px-2 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
+            className={`py-3 px-1.5 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
               paymentType === 'CARD'
                 ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/30'
                 : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
@@ -182,7 +227,7 @@ export const PaymentModal: React.FC<Props> = ({
 
           <button
             onClick={() => { setPaymentType('SPLIT'); setTenderedCash(Math.floor(grandTotal / 2)); setTenderedCard(grandTotal - Math.floor(grandTotal / 2)); }}
-            className={`py-3 px-2 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
+            className={`py-3 px-1.5 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
               paymentType === 'SPLIT'
                 ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/30'
                 : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
@@ -194,14 +239,26 @@ export const PaymentModal: React.FC<Props> = ({
 
           <button
             onClick={() => { setPaymentType('ON_ACCOUNT'); }}
-            className={`py-3 px-2 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
+            className={`py-3 px-1.5 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
               paymentType === 'ON_ACCOUNT'
                 ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/30'
                 : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
             }`}
           >
             <FileText className="w-5 h-5" />
-            <span>{I18nService.t('pos.pay_on_account')}</span>
+            <span>On Account</span>
+          </button>
+
+          <button
+            onClick={() => { setPaymentType('INSTALLMENT'); }}
+            className={`py-3 px-1.5 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1.5 transition ${
+              paymentType === 'INSTALLMENT'
+                ? 'bg-amber-600 text-white border-amber-500 shadow-lg shadow-amber-600/30'
+                : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
+            }`}
+          >
+            <Calendar className="w-5 h-5 text-amber-300" />
+            <span>Installments</span>
           </button>
         </div>
 
@@ -298,6 +355,84 @@ export const PaymentModal: React.FC<Props> = ({
             <div className="flex justify-between">
               <span className="text-slate-400">Credit Limit:</span>
               <span className="font-bold text-emerald-400">${Number(customer?.credit_limit || 0).toFixed(2)}</span>
+            </div>
+          </div>
+        )}
+
+        {/* INSTALLMENT Configuration Box */}
+        {paymentType === 'INSTALLMENT' && (
+          <div className="bg-slate-950 border border-amber-500/30 rounded-2xl p-4 mb-5 space-y-3.5">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                <Calendar className="w-4 h-4" />
+                <span>Installment Financing Plan (الأقساط)</span>
+              </span>
+              <span className="text-[11px] font-semibold text-slate-400">
+                Customer: <span className="text-white font-bold">{customer?.name || 'Please select customer'}</span>
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* Down payment */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">
+                  Down Payment (الدفعة الأولى) ({primarySymbol})
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={downPayment}
+                  onChange={(e) => setDownPayment(parseFloat(e.target.value) || 0)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              {/* Number of installments */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">
+                  Installments (عدد الدفعات)
+                </label>
+                <select
+                  value={installmentCount}
+                  onChange={(e) => setInstallmentCount(parseInt(e.target.value) || 1)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value={2}>2 Months (شهران)</option>
+                  <option value={3}>3 Months (3 أشهر)</option>
+                  <option value={4}>4 Months (4 أشهر)</option>
+                  <option value={6}>6 Months (6 أشهر)</option>
+                  <option value={10}>10 Months (10 أشهر)</option>
+                  <option value={12}>12 Months (سنة كاملة)</option>
+                  <option value={24}>24 Months (سنتان)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* First due date */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-400 mb-1">
+                First Due Date (تاريخ أول قسط)
+              </label>
+              <input
+                type="date"
+                value={firstDueDate}
+                onChange={(e) => setFirstDueDate(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            {/* Installment Summary */}
+            <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-3 grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <span className="text-slate-400 block text-[11px]">Financed Balance</span>
+                <span className="font-black text-amber-400 text-sm">{primarySymbol}{financedRemaining.toFixed(2)}</span>
+              </div>
+              <div className="text-right">
+                <span className="text-slate-400 block text-[11px]">Monthly Payment</span>
+                <span className="font-black text-emerald-400 text-sm">
+                  {primarySymbol}{monthlyInstallment.toFixed(2)} / mo
+                </span>
+              </div>
             </div>
           </div>
         )}

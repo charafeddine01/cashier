@@ -24,13 +24,17 @@ $tablesToClear = [
     'orders', 'order_items', 'order_returns', 'order_return_items',
     'product_serials', 'product_recipes', 'product_batches', 'stock_inventory',
     'stock_movements', 'cash_movements', 'shifts', 'products', 'categories',
-    'customers', 'customer_ledger', 'expenses', 'suppliers', 'purchase_orders'
+    'customers', 'customer_ledger', 'expenses', 'suppliers', 'purchase_orders',
+    'installment_plans', 'installment_schedule', 'installment_payments'
 ];
 
 $pdo->exec("PRAGMA foreign_keys = OFF;");
 foreach ($tablesToClear as $tbl) {
     $pdo->exec("DELETE FROM `{$tbl}`;");
 }
+try {
+    $pdo->exec("DELETE FROM `sqlite_sequence`;");
+} catch (\Throwable $e) {}
 
 // 1. Signed Ed25519 Commercial License for Solar Showroom
 $vendorSecretKeyHex = 'b3106c9011e167d15a84ae3f12857256be7d4efc357cedfbb7d0604bb322415e7cba51469668791a660ee64c5815922b0349dc4e74ae39e2cc9c5d232dacbcf4';
@@ -306,6 +310,49 @@ $pdo->prepare('INSERT INTO `shifts` (
     `id`, `cashier_id`, `terminal_id`, `opened_at`, `opening_float`, `status`
 ) VALUES (1, 1, "TERM-01", datetime("now"), 200.00, "OPEN")')->execute();
 
-$pdo->exec("PRAGMA foreign_keys = ON;");
+// 12. Pre-Seed Sample Installment Plan for Ali Mortada (Solar Contractor)
+// Order for 5kW Solar Kit ($2,850 total, $850 down payment, $2,000 in 4 installments of $500)
+$pdo->prepare('INSERT INTO `orders` (
+    `id`, `invoice_number`, `shift_id`, `cashier_id`, `customer_id`, `warehouse_id`,
+    `order_type`, `status`, `subtotal`, `tax_total`, `discount_total`, `grand_total`,
+    `grand_total_secondary`, `exchange_rate`, `paid_cash`, `paid_card`, `paid_credit`,
+    `paid_on_account`, `change_given`, `change_currency`, `idempotency_key`, `terminal_id`, `notes`
+) VALUES (
+    1, "INV-20261020-SOLAR1", 1, 1, 1, 1,
+    "RETAIL", "PAID", 2850.00, 0.00, 0.00, 2850.00,
+    255075000.00, 89500.00, 850.00, 0.00, 0.00,
+    2000.00, 0.00, "PRIMARY", "IDEM-SEED-SOLAR-001", "TERM-01", "5kW Hybrid Residential Kit on 4-Month Installment Plan"
+)')->execute();
 
+$pdo->prepare('INSERT INTO `installment_plans` (
+    `id`, `order_id`, `customer_id`, `plan_number`, `total_amount`, `down_payment`,
+    `remaining_balance`, `total_installments`, `installment_amount`, `frequency`,
+    `status`, `notes`
+) VALUES (
+    1, 1, 1, "PLAN-20261020-ALIM", 2850.00, 850.00,
+    1500.00, 4, 500.00, "MONTHLY",
+    "ACTIVE", "Ali Mortada 4-Month Solar System Financing"
+)')->execute();
+
+// Installment Schedule
+$pdo->prepare('INSERT INTO `installment_schedule` (
+    `id`, `plan_id`, `installment_number`, `due_date`, `amount_due`, `amount_paid`,
+    `remaining_amount`, `status`, `notes`, `paid_at`
+) VALUES
+(1, 1, 1, "2026-10-20", 500.00, 500.00, 0.00, "PAID", "Installment 1 of 4", "2026-10-20 11:30:00"),
+(2, 1, 2, "2026-11-20", 500.00, 0.00, 500.00, "PENDING", "Installment 2 of 4", NULL),
+(3, 1, 3, "2026-12-20", 500.00, 0.00, 500.00, "PENDING", "Installment 3 of 4", NULL),
+(4, 1, 4, "2027-01-20", 500.00, 0.00, 500.00, "PENDING", "Installment 4 of 4", NULL)
+')->execute();
+
+// Payment Record for Installment #1
+$pdo->prepare('INSERT INTO `installment_payments` (
+    `id`, `schedule_id`, `plan_id`, `customer_id`, `receipt_number`, `amount_paid`,
+    `currency`, `exchange_rate`, `payment_method`, `cashier_id`, `notes`
+) VALUES (
+    1, 1, 1, 1, "INST-REC-20261020-9901", 500.00,
+    "USD", 89500.00, "CASH", 1, "Installment 1 paid at showroom counter"
+)')->execute();
+
+$pdo->exec("PRAGMA foreign_keys = ON;");
 echo "Successfully generated Solar Showroom SQLite database!\n";

@@ -251,6 +251,17 @@ class PosController
                 ]);
             }
 
+            // 3b. Installment Plan Creation (if order is financed on installments)
+            $createdPlan = null;
+            if (!empty($orderData['installment_plan']) && $customerId > 0) {
+                $instData = $orderData['installment_plan'];
+                $instData['order_id'] = $orderId;
+                $instData['customer_id'] = $customerId;
+                $instData['total_amount'] = $grandTotal;
+                $instData['down_payment'] = ($paidCash + $paidCard);
+                $createdPlan = InstallmentsController::createPlan($instData);
+            }
+
             // 4. Update Shift Totals if Shift is Open
             if ($shiftId) {
                 $actualCashNet = max(0, $paidCash - $changeGiven);
@@ -285,6 +296,7 @@ class PosController
                 'grand_total_secondary' => $grandTotalSecondary,
                 'change_given' => $changeGiven,
                 'shift_id' => $shiftId,
+                'installment_plan' => $createdPlan,
             ], 201, 'Order created successfully');
         } catch (\Throwable $e) {
             Database::rollBack();

@@ -28,6 +28,46 @@ class Database
             'database' => __DIR__ . '/../../database/omnipos.sqlite'
         ];
 
+        // Multi-Tenant Showroom & Live Demo Resolver
+        $tenant = self::resolveTenant();
+        if (!empty($tenant) && ($dbConfig['driver'] ?? 'sqlite') === 'sqlite') {
+            $baseDir = dirname($dbConfig['database']);
+            $tenantsDir = $baseDir . '/tenants';
+            if (!is_dir($tenantsDir)) {
+                mkdir($tenantsDir, 0755, true);
+            }
+            $cleanTenant = preg_replace('/[^a-zA-Z0-9_-]/', '', strtolower($tenant));
+
+            $solarAliases = ['solar', 'al-shams', 'alshams', 'solar-tech', 'al-shams-solar'];
+            if (in_array($cleanTenant, $solarAliases, true)) {
+                $solarDb = $baseDir . '/omnipos-solar.sqlite';
+                if (file_exists($solarDb)) {
+                    $dbConfig['database'] = $solarDb;
+                }
+            } else {
+                $tenantDb = $tenantsDir . '/' . $cleanTenant . '.sqlite';
+                if (!file_exists($tenantDb)) {
+                    $baseDb = $baseDir . '/omnipos-solar.sqlite';
+                    if (!file_exists($baseDb)) {
+                        $baseDb = $baseDir . '/omnipos.sqlite';
+                    }
+                    if (file_exists($baseDb)) {
+                        copy($baseDb, $tenantDb);
+                        try {
+                            $tPdo = new PDO("sqlite:{$tenantDb}");
+                            $formattedName = ucwords(str_replace(['-', '_'], ' ', $cleanTenant));
+                            $tPdo->prepare("UPDATE company_settings SET company_name = :cn WHERE id = 1")->execute([
+                                ':cn' => $formattedName . ' Showroom'
+                            ]);
+                        } catch (\Throwable $t) {}
+                    }
+                }
+                if (file_exists($tenantDb)) {
+                    $dbConfig['database'] = $tenantDb;
+                }
+            }
+        }
+
         try {
             if (($dbConfig['driver'] ?? 'mysql') === 'sqlite') {
                 $dbPath = $dbConfig['database'];
@@ -47,6 +87,8 @@ class Database
 
                 if ($isNewDb) {
                     self::initializeSqliteDatabase($pdo);
+                } else {
+                    self::ensureSchemaMigrations($pdo);
                 }
             } else {
                 // MySQL / MariaDB for production shared hosting
@@ -124,6 +166,84 @@ class Database
                 }
             }
         }
+    }
+
+    private static function ensureSchemaMigrations(PDO $pdo): void
+    {
+        try {
+            $pdo->exec("
+            CREATE TABLE IF NOT EXISTS `installment_plans` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                `order_id` INTEGER NOT NULL,
+                `customer_id` INTEGER NOT NULL,
+                `plan_number` VARCHAR(64) NOT NULL UNIQUE,
+                `total_amount` DECIMAL(15,4) NOT NULL DEFAULT 0.0000,
+                `down_payment` DECIMAL(15,4) NOT NULL DEFAULT 0.0000,
+                `remaining_balance` DECIMAL(15,4) NOT NULL DEFAULT 0.0000,
+                `total_installments` INTEGER NOT NULL DEFAULT 1,
+                `installment_amount` DECIMAL(15,4) NOT NULL DEFAULT 0.0000,
+                `frequency` VARCHAR(32) NOT NULL DEFAULT 'MONTHLY',
+                `status` VARCHAR(32) NOT NULL DEFAULT 'ACTIVE',
+                `notes` TEXT NULL,
+                `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS `installment_schedule` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                `plan_id` INTEGER NOT NULL,
+                `installment_number` INTEGER NOT NULL,
+                `due_date` DATE NOT NULL,
+                `amount_due` DECIMAL(15,4) NOT NULL DEFAULT 0.0000,
+                `amount_paid` DECIMAL(15,4) NOT NULL DEFAULT 0.0000,
+                `remaining_amount` DECIMAL(15,4) NOT NULL DEFAULT 0.0000,
+                `status` VARCHAR(32) NOT NULL DEFAULT 'PENDING',
+                `notes` TEXT NULL,
+                `paid_at` TIMESTAMP NULL,
+                `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS `installment_payments` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                `schedule_id` INTEGER NOT NULL,
+                `plan_id` INTEGER NOT NULL,
+                `customer_id` INTEGER NOT NULL,
+                `receipt_number` VARCHAR(64) NOT NULL UNIQUE,
+                `amount_paid` DECIMAL(15,4) NOT NULL DEFAULT 0.0000,
+                `currency` VARCHAR(8) NOT NULL DEFAULT 'USD',
+                `exchange_rate` DECIMAL(15,4) NOT NULL DEFAULT 1.0000,
+                `payment_method` VARCHAR(32) NOT NULL DEFAULT 'CASH',
+                `cashier_id` INTEGER NOT NULL,
+                `notes` TEXT NULL,
+                `payment_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+            ");
+        } catch (\Throwable $e) {
+            // Ignore if already created
+        }
+    }
+
+    public static function resolveTenant(): string
+    {
+        if (!empty($_SERVER['HTTP_X_TENANT'])) {
+            return trim($_SERVER['HTTP_X_TENANT']);
+        }
+        if (!empty($_GET['tenant'])) {
+            return trim($_GET['tenant']);
+        }
+        if (!empty($_SERVER['HTTP_REFERER'])) {
+            $path = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH);
+            $parts = array_values(array_filter(explode('/', (string)$path)));
+            if (!empty($parts[0]) && !in_array($parts[0], ['api', 'license-api', 'install', 'dist', 'assets', 'uploads'], true)) {
+                return $parts[0];
+            }
+        }
+        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+        $parts = array_values(array_filter(explode('/', (string)$uri)));
+        if (!empty($parts[0]) && !in_array($parts[0], ['api', 'license-api', 'install', 'dist', 'assets', 'uploads'], true)) {
+            return $parts[0];
+        }
+        return '';
     }
 
     public static function beginTransaction(): bool

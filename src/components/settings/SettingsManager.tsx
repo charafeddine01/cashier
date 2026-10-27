@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CompanySettings } from '../../types';
 import { ApiService } from '../../services/api';
 import { I18nService } from '../../services/i18nService';
+import { BackupSyncManager } from './BackupSyncManager';
 import {
   Settings,
   Upload,
@@ -11,15 +12,18 @@ import {
   Printer,
   CheckCircle2,
   Image,
-  Save
+  Save,
+  HardDrive
 } from 'lucide-react';
 
 interface Props {
   settings: CompanySettings | null;
   onSettingsUpdated: (updated: CompanySettings) => void;
+  initialSubTab?: 'profile' | 'hardware' | 'backup';
 }
 
-export const SettingsManager: React.FC<Props> = ({ settings, onSettingsUpdated }) => {
+export const SettingsManager: React.FC<Props> = ({ settings, onSettingsUpdated, initialSubTab = 'profile' }) => {
+  const [activeSubTab, setActiveSubTab] = useState<'profile' | 'hardware' | 'backup'>(initialSubTab);
   const [formData, setFormData] = useState<Partial<CompanySettings>>(settings || {});
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -78,25 +82,75 @@ export const SettingsManager: React.FC<Props> = ({ settings, onSettingsUpdated }
             <Settings className="w-6 h-6 text-blue-400" />
             <h2 className="text-xl font-black text-white">{I18nService.t('nav.settings')}</h2>
           </div>
+          {activeSubTab !== 'backup' && (
+            <button
+              onClick={handleSave}
+              disabled={loading}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-2xl text-xs transition flex items-center gap-2 shadow-lg shadow-blue-600/30"
+            >
+              <Save className="w-4 h-4" />
+              <span>{loading ? 'Saving...' : 'Save Settings'}</span>
+            </button>
+          )}
+        </div>
+
+        {/* Sub-navigation Tabs */}
+        <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
           <button
-            onClick={handleSave}
-            disabled={loading}
-            className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-2xl text-xs transition flex items-center gap-2 shadow-lg shadow-blue-600/30"
+            type="button"
+            onClick={() => setActiveSubTab('profile')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
+              activeSubTab === 'profile'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            }`}
           >
-            <Save className="w-4 h-4" />
-            <span>{loading ? 'Saving...' : 'Save Settings'}</span>
+            <Store className="w-3.5 h-3.5" />
+            <span>Store Profile & Logos</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSubTab('hardware')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
+              activeSubTab === 'hardware'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            }`}
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Currencies & Hardware</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSubTab('backup')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
+              activeSubTab === 'backup'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            }`}
+          >
+            <HardDrive className="w-3.5 h-3.5" />
+            <span>Database Backup & Cloud Sync</span>
+            <span className="bg-indigo-500/30 text-indigo-200 text-[10px] px-1.5 py-0.2 rounded-full font-mono">
+              USB + Google Drive
+            </span>
           </button>
         </div>
 
-        {successMsg && (
-          <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-2xl text-xs flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-            <span>{successMsg}</span>
-          </div>
-        )}
+        {activeSubTab === 'backup' ? (
+          <BackupSyncManager />
+        ) : (
+          <form onSubmit={handleSave} className="space-y-6">
+            {successMsg && (
+              <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-2xl text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{successMsg}</span>
+              </div>
+            )}
 
-        <form onSubmit={handleSave} className="space-y-6">
-          {/* Section 1: Logos & Branding */}
+            {activeSubTab === 'profile' && (
+              <>
+                {/* Section 1: Logos & Branding */}
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <Image className="w-4 h-4 text-purple-400" />
@@ -268,7 +322,11 @@ export const SettingsManager: React.FC<Props> = ({ settings, onSettingsUpdated }
               />
             </div>
           </div>
+        </>
+      )}
 
+      {activeSubTab === 'hardware' && (
+        <>
           {/* Section 3: Dual Currency & Exchange Rates */}
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -370,7 +428,10 @@ export const SettingsManager: React.FC<Props> = ({ settings, onSettingsUpdated }
               />
             </div>
           </div>
-        </form>
+        </>
+      )}
+    </form>
+  )}
       </div>
     </div>
   );

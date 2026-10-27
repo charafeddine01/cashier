@@ -356,6 +356,7 @@ export const PosTerminal: React.FC<Props> = ({ settings, activeShift, onOpenShif
       paid_on_account: paymentData.paidOnAccount,
       change_given: paymentData.changeGiven,
       change_currency: paymentData.changeCurrency,
+      installment_plan: paymentData.installmentPlan,
       items: cartItems,
       idempotency_key: 'IDEM-' + crypto.randomUUID(),
     };
